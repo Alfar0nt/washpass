@@ -1,0 +1,5 @@
+@import '../global.css';
+@import '../components/buttons.css';
+@import '../components/location-picker.css';
+@import '../components/admin-table.css';
+@import '../components/admin-detail.css';

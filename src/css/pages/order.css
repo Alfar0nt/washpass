@@ -1,0 +1,11 @@
+@import '../global.css';
+@import '../components/buttons.css';
+@import '../components/location-picker.css';
+@import '../components/customer-form.css';
+@import '../components/order-review.css';
+@import '../components/step-indicator.css';
+@import '../components/category-card.css';
+@import '../components/material-card.css';
+@import '../components/wash-type-card.css';
+@import '../components/photo-uploader.css';
+@import '../components/cart-summary.css';
