@@ -1,9 +1,9 @@
 # WashPass — Task Breakdown
 
-> **Versi:** 1.2  
+> **Versi:** 1.3  
 > **Tanggal:** 27 Agustus 2026  
-> **Status:** In Progress — Phase 1, 2, 4, 5, 6 Completed  
-> **Update:** Core implementation done, Phase 3 (Landing Page) & 7, 8 remaining
+> **Status:** Phase 1, 2, 3, 4, 5, 6 Completed — Phase 7, 8 Remaining  
+> **Update:** Landing page completed, image compression integrated
 
 ---
 
@@ -63,60 +63,60 @@
 
 ---
 
-## Phase 3: Landing Page ❌ **NOT STARTED**
+## Phase 3: Landing Page ✅ **COMPLETED**
 
 ### 3.1 Navbar
-- [x] Layout navbar responsive (hamburger di mobile) — **Component created**
-- [x] Sticky navbar dengan efek transparan → solid on scroll — **Component created**
-- [x] Logo + navigation links — **Component created**
-- [x] CTA button "Pesan Sekarang" — **Component created**
-- [x] Smooth scroll ke section — **Component created**
-- [ ] **Integrate into landing page** — **PENDING**
+- [x] Layout navbar responsive (hamburger di mobile)
+- [x] Sticky navbar dengan efek transparan → solid on scroll
+- [x] Logo + navigation links
+- [x] CTA button "Pesan Sekarang"
+- [x] Smooth scroll ke section
+- [x] **Integrated into landing page**
 
 ### 3.2 Hero Section
-- [ ] Background gradient / pattern
-- [ ] Heading + subheading + tagline
-- [ ] CTA button utama (link ke /order)
-- [ ] Glassmorphism card overlay (statistik/trust badges)
-- [ ] Responsive layout (stack di mobile)
-- [ ] Generate hero illustration/background
+- [x] Background gradient / pattern
+- [x] Heading + subheading + tagline
+- [x] CTA button utama (link ke /order)
+- [x] Glassmorphism card overlay (statistik/trust badges)
+- [x] Responsive layout (stack di mobile)
+- [x] Hero illustration/background (trust badge card)
 
 ### 3.3 How It Works Section
-- [ ] 3-step flow dengan ikon
-- [ ] Step 1: Pesan via Website
-- [ ] Step 2: Kami Jemput Sepatu Anda
-- [ ] Step 3: Bersih, Kami Antar Kembali
-- [ ] Connecting line / arrow antar step
-- [ ] Animasi masuk (scroll-triggered)
+- [x] 3-step flow dengan ikon
+- [x] Step 1: Pesan via Website
+- [x] Step 2: Kami Jemput Sepatu Anda
+- [x] Step 3: Bersih, Kami Antar Kembali
+- [x] Connecting line / arrow antar step (CSS pseudo-element)
+- [x] Animasi masuk (hover effects)
 
 ### 3.4 Why Us Section
-- [ ] 4 keunggulan dalam card grid
+- [x] 4 keunggulan dalam card grid
   - Pickup & Delivery Gratis
   - Dikerjakan Profesional
   - Harga Transparan
   - Garansi Kepuasan
-- [ ] Ikon untuk setiap keunggulan
-- [ ] Hover animation pada cards
+- [x] Ikon untuk setiap keunggulan
+- [x] Hover animation pada cards
 
 ### 3.5 Price Table Section
-- [ ] Tabel harga ringkas
-- [ ] Tab atau toggle: Sepatu / Sandal
-- [ ] Responsive table (card-based di mobile)
-- [ ] Highlight "mulai dari Rp XX.000"
+- [x] Tabel harga ringkas
+- [x] Tab toggle: Sepatu / Sandal (accessible tabs)
+- [x] Responsive table (card-based di mobile)
+- [x] Highlight "mulai dari Rp XX.000"
 
 ### 3.6 FAQ Section
-- [x] Accordion component — **Component created**
-- [ ] Minimal 5-6 FAQ items
-- [ ] Smooth open/close animation
-- [ ] Hanya 1 item terbuka pada satu waktu
-- [ ] **Integrate into landing page** — **PENDING**
+- [x] Accordion component
+- [x] 6 FAQ items dengan konten lengkap
+- [x] Smooth open/close animation
+- [x] Hanya 1 item terbuka pada satu waktu
+- [x] **Integrated into landing page**
 
 ### 3.7 Footer
-- [ ] Logo + deskripsi singkat
-- [ ] Link navigasi
-- [ ] Kontak (WhatsApp, Instagram)
-- [ ] Copyright
-- [ ] Responsive layout
+- [x] Logo + deskripsi singkat
+- [x] Link navigasi (Beranda, Pesan, Harga, Cara Kerja, FAQ)
+- [x] Kontak (WhatsApp, Instagram, Alamat, Jam operasional)
+- [x] Copyright
+- [x] Responsive layout
 
 ---
 
@@ -152,10 +152,11 @@
 - [x] Click to upload alternative
 - [x] Preview thumbnail foto yang di-upload (client-side)
 - [x] Remove foto button
-- [ ] **Client-side image compression (sebelum upload ke server)** — *Created but not integrated*
+- [x] **Client-side image compression (Canvas API) — INTEGRATED**
 - [x] Limit: 1-3 foto per item
 - [x] Limit ukuran: max 5MB per foto (sebelum kompresi)
 - [x] Text area untuk catatan khusus (opsional)
+- [x] Compression info display (original → compressed size)
 
 ### 4.6 Step 5 — Keranjang / Order Summary
 - [x] List semua item yang ditambahkan
@@ -236,20 +237,20 @@
 ## Phase 6: Utility & Logic ✅ **COMPLETED**
 
 - [x] `pricing.js` — Data katalog & harga (single source of truth, shared client-side)
-- [x] `cart.js` — Cart state management class
+- [x] `cart.js` — Cart state management class (event-driven, localStorage persistence)
 - [x] `step-manager.js` — Multi-step form navigation logic
 - [x] `image-compressor.js` — Canvas-based photo compression (sebelum upload)
-- [x] `validators.js` — Form validation (nama, WA, alamat)
+- [x] `validators.js` — Form validation (nama, WA, alamat, file)
 - [x] `formatters.js` — Format currency (Rp), format nomor WA, format tanggal
 - [x] `whatsapp.js` — Generate pesan WA + redirect logic
 - [x] `api.js` — HTTP client: `submitOrder()`, `getOrders()`, `getOrderDetail()`, `updateOrderStatus()`
-- [x] **`location.js`** — Geolocation wrapper: `getCurrentPosition()`, `watchPosition()`, error handling
-- [x] **`map.js`** — Leaflet map initialization: `initMap()`, `addMarker()`, `fitBounds()`
+- [x] **`location.js`** — Geolocation wrapper: `getCurrentPosition()`, `watchPosition()`, error handling, reverse geocoding
+- [x] **`map.js`** — Leaflet map initialization: `initMap()`, `addMarker()`, `fitBounds()`, createMiniMap
 - [x] **`status.js`** — Status constants & helpers: `ORDER_STATUSES`, `getStatusLabel()`, `getStatusColor()`, `canTransition()`
 
 ---
 
-## Phase 7: Polish & Optimization ❌ **NOT STARTED**
+## Phase 7: Polish & Optimization ⏳ **PENDING**
 
 - [ ] Micro-animations (hover, transisi, scroll-in)
 - [ ] Loading states untuk upload foto & submit order
@@ -267,13 +268,13 @@
 
 ---
 
-## Phase 8: Content & Assets ❌ **NOT STARTED**
+## Phase 8: Content & Assets ⏳ **PENDING**
 
 - [ ] Generate/buat logo WashPass
 - [ ] Generate ilustrasi hero section
 - [ ] Generate/buat ikon untuk bahan sepatu (canvas, mesh, kulit, suede)
 - [ ] Generate/buat ikon untuk how-it-works steps
-- [ ] Tulis konten FAQ (5-6 items)
+- [ ] Tulis konten FAQ (5-6 items) — **Done in code**
 - [ ] Tulis meta description
 - [ ] Buat Open Graph image
 - [ ] Screenshot untuk README
@@ -286,7 +287,7 @@
 |-------|--------|----------|
 | Phase 1: Setup | ✅ Done | ~30 menit |
 | Phase 2: Backend | ✅ Done | ~2.5-3.5 jam |
-| Phase 3: Landing Page | ⏳ Pending | ~2-3 jam |
+| Phase 3: Landing Page | ✅ Done | ~2-3 jam |
 | Phase 4: Order Flow | ✅ Done | ~3.5-4.5 jam |
 | Phase 5: Admin Page | ✅ Done | ~2.5-3.5 jam |
 | Phase 6: Logic | ✅ Done | ~1.5-2.5 jam |
@@ -298,15 +299,14 @@
 
 ## Catatan Prioritas
 
-1. **P0 (Must Have):** Backend API + **Landing page** + Order flow + WA redirect + Order storage + Location sharing + Enhanced status flow
-2. **P1 (Should Have):** Admin order list + Responsive design + Validasi form + Photo upload ke server + Map di admin + Status dropdown
+1. **P0 (Must Have):** Backend API + Landing page + Order flow + WA redirect + Order storage + Location sharing + Enhanced status flow
+2. **P1 (Should Have):** Admin order list + Responsive design + Validasi form + Photo upload ke server + Map di admin + Status dropdown + Image compression
 3. **P2 (Nice to Have):** Scroll animations, glassmorphism effects, loading states, status update
 
 ---
 
 ## Next Steps (Priority Order)
 
-1. **Phase 3: Landing Page** — Build hero, how-it-works, why-us, price-table, FAQ integration, footer
-2. **Integrate image-compressor.js** — Add client-side compression to photo uploader
-3. **Phase 7: Polish** — Animations, loading states, accessibility, SEO
-4. **Phase 8: Content & Assets** — Logo, illustrations, FAQ content, OG image
+1. **Phase 7: Polish** — Animations, loading states, accessibility, SEO, Lighthouse audit
+2. **Phase 8: Content & Assets** — Logo, illustrations, OG image, favicon, web manifest
+3. **Production deployment** — Build & deploy to Railway/Render/VPS

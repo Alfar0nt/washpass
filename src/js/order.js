@@ -5,6 +5,7 @@ import { cart } from './components/cart.js';
 import { submitOrder } from './services/api.js';
 import { generateWhatsAppMessage, redirectToWhatsApp } from './utils/whatsapp.js';
 import { formatCurrency } from './utils/formatters.js';
+import { compressImage, validateImageFile } from './utils/image-compressor.js';
 
 const STEP_ORDER = ['category', 'material', 'washType', 'photos', 'cart', 'customer', 'review'];
 
@@ -265,9 +266,44 @@ function initPhotoUploader() {
   input.addEventListener('change', (e) => handleFiles(e.target.files));
 }
 
-function handleFiles(files) {
+async function handleFiles(files) {
   const fileArray = Array.from(files).slice(0, 3);
-  currentPhotos = fileArray;
+  const compressedPhotos = [];
+  
+  const preview = document.getElementById('photoPreview');
+  preview.innerHTML = '<p class="photo-uploader__text">Mengompresi foto...</p>';
+  
+  for (const file of fileArray) {
+    const validation = validateImageFile(file, 5);
+    if (!validation.valid) {
+      alert(`File "${file.name}": ${validation.error}`);
+      continue;
+    }
+    
+    try {
+      const result = await compressImage(file, {
+        maxWidth: 1200,
+        maxHeight: 1200,
+        quality: 0.8,
+      });
+      compressedPhotos.push({
+        file: result.file,
+        originalFile: file,
+        originalSize: result.originalSize,
+        compressedSize: result.compressedSize,
+      });
+    } catch (error) {
+      console.error('Compression failed for', file.name, error);
+      compressedPhotos.push({
+        file: file,
+        originalFile: file,
+        originalSize: file.size,
+        compressedSize: file.size,
+      });
+    }
+  }
+  
+  currentPhotos = compressedPhotos;
   renderPhotoPreview();
 }
 
@@ -281,9 +317,20 @@ function renderPhotoPreview() {
   preview.innerHTML = `
     <h4 class="preview-title">Preview Foto (${currentPhotos.length}/3)</h4>
     <div class="preview-grid">
-      ${currentPhotos.map((file, index) => `
+      ${currentPhotos.map((photoData, index) => {
+        const file = photoData.file || photoData;
+        const originalSize = photoData.originalSize ? formatFileSize(photoData.originalSize) : formatFileSize(file.size);
+        const compressedSize = photoData.compressedSize ? formatFileSize(photoData.compressedSize) : '';
+        const savings = photoData.originalSize && photoData.compressedSize 
+          ? ` (${Math.round((1 - photoData.compressedSize / photoData.originalSize) * 100)}% lebih kecil)` 
+          : '';
+        return `
         <div class="preview-item">
           <img src="${URL.createObjectURL(file)}" alt="Preview ${index + 1}" class="preview-img">
+          <div class="preview-info">
+            <span class="preview-name">${file.name}</span>
+            <span class="preview-size">${originalSize} → ${compressedSize}${savings}</span>
+          </div>
           <button type="button" class="preview-remove" data-index="${index}" aria-label="Hapus foto">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="18" y1="6" x2="6" y2="18" />
@@ -291,7 +338,8 @@ function renderPhotoPreview() {
             </svg>
           </button>
         </div>
-      `).join('')}
+        `;
+      }).join('')}
     </div>
   `;
 
@@ -305,6 +353,14 @@ function renderPhotoPreview() {
   });
 }
 
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
 function addToCart() {
   if (currentPhotos.length === 0) {
     alert('Minimal 1 foto harus di-upload');
@@ -316,7 +372,7 @@ function addToCart() {
   
   const item = {
     ...tempItem,
-    photos: currentPhotos,
+    photos: currentPhotos.map(p => p.file || p),
     notes: notes || null,
   };
 

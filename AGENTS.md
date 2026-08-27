@@ -1,7 +1,7 @@
 # WashPass — Agent Instructions
 
 ## Project Status
-**Core Implementation Complete** — Phase 1, 2, 4, 5, 6 done. Phase 3 (Landing Page), 7 (Polish), 8 (Assets) pending.
+**Phase 1-6 Complete** — Phase 1 (Setup), 2 (Backend), 3 (Landing Page), 4 (Order Flow), 5 (Admin), 6 (Utilities) done. Phase 7 (Polish), 8 (Assets) pending.
 
 ## Tech Stack (from `.ai/tech-stack.md`)
 - **Frontend Build**: Vite (vanilla JS, ES Modules)
@@ -31,7 +31,7 @@ washpass/
 │   │   └── upload.js       # Multer config
 │   └── uploads/            # Photo files (gitignored)
 ├── src/                    # Frontend (Vite)
-│   ├── index.html          # Landing page (empty - Phase 3 pending)
+│   ├── index.html          # Landing page (✅ complete)
 │   ├── order.html          # Order flow (✅ complete)
 │   ├── admin.html          # Admin order list (✅ complete)
 │   ├── css/
@@ -41,7 +41,7 @@ washpass/
 │   │   ├── components/     # 13 component CSS files
 │   │   └── pages/          # landing.css, order.css, admin.css
 │   ├── js/
-│   │   ├── main.js         # Landing entry (imports only)
+│   │   ├── main.js         # Landing entry (✅ renders all sections)
 │   │   ├── order.js        # Order flow entry (✅ complete)
 │   │   ├── admin.js        # Admin page entry (✅ complete)
 │   │   ├── config/pricing.js
@@ -49,9 +49,9 @@ washpass/
 │   │   ├── services/api.js # HTTP client for backend
 │   │   └── utils/          # 9 utility modules
 │   └── assets/
+├── public/                 # Vite public assets (exists)
 ├── vite.config.js
 ├── package.json
-├── public/                 # (create before running: mkdir -p public)
 └── .gitignore
 ```
 
@@ -63,7 +63,7 @@ washpass/
 | Express.js + SQLite | Lightweight backend; SQLite = file-based DB, zero-config |
 | `better-sqlite3` | Synchronous API, simpler code, no async/await for DB |
 | Multer for uploads | Standard Express file upload middleware |
-| Cart state in memory | Class-based, event-driven; lost on refresh (OK for MVP) |
+| Cart state in localStorage | Class-based, event-driven; persists across refresh |
 | Photo upload to server | Compress client-side → upload via multipart → stored in uploads/ |
 | WhatsApp integration | `wa.me/{number}?text={encoded}`; triggered AFTER server save |
 | Admin without auth | MVP constraint; admin URL is "secret" |
@@ -94,7 +94,7 @@ washpass/
 ## Implementation Phases (from `.ai/tasks.md`)
 1. **Setup** ✅ — Vite init, Express init, folder structure, CSS tokens (~30 min)
 2. **Backend** ✅ — SQLite schema, Express routes, Multer upload, API CRUD (~2-3 hr)
-3. **Landing Page** ⏳ — 7 sections: Navbar, Hero, How It Works, Why Us, Price Table, FAQ, Footer (~2-3 hr)
+3. **Landing Page** ✅ — 7 sections: Navbar, Hero, How It Works, Why Us, Price Table, FAQ, Footer (~2-3 hr)
 4. **Order Flow** ✅ — 7 steps with step indicator, validation, cart, GPS location, API submit (~3-4 hr)
 5. **Admin Page** ✅ — Order list table, order detail modal with map, status dropdown with validation (~2-3 hr)
 6. **Utilities** ✅ — pricing config, cart class, step manager, image compressor, validators, formatters, WA generator, API client, location, map, status (~1-2 hr)
@@ -132,16 +132,16 @@ Production:
 - `.ai/tasks.md` — Detailed task breakdown with checkboxes (updated with current status)
 
 ## Gotchas for Agents
-- **Landing page is empty** — `src/index.html` has empty `#app`, `main.js` only imports components but doesn't render them (Phase 3)
+- **Landing page** — Now fully implemented with all 7 sections
 - **Design tokens defined in tech-stack.md** — Use those exact CSS custom properties
 - **Pricing is single-source** — All prices in `src/js/config/pricing.js` only
 - **WhatsApp number** — Hardcoded in config, easy to change
-- **State not persisted client-side** — Cart clears on refresh (MVP constraint)
+- **Cart persists in localStorage** — Survives refresh (was MVP constraint, now fixed)
 - **Mobile-first** — Breakpoints: <768px, 768-1024px, >1024px
 - **SQLite DB auto-created** — Schema runs on server start, no migration needed
 - **uploads/ is gitignored** — Photos stored on server filesystem only
 - **Admin has no auth** — Anyone with the URL can access (MVP)
 - **Order submit is dual** — Save to SQLite + redirect to WhatsApp
-- **Photo compression not integrated** — `image-compressor.js` exists but photo uploader in `order.js` uses raw Files
-- **No `public/` directory** — Create before running: `mkdir -p public`
+- **Photo compression integrated** — Canvas API compression in photo uploader
+- **`public/` directory** — Exists (required by Vite config)
 - **Order flow steps inline** — Steps rendered directly in `order.js` instead of modular components

@@ -1,4 +1,9 @@
 @import '../global.css';
 @import '../components/buttons.css';
 @import '../components/navbar.css';
+@import '../components/hero.css';
+@import '../components/how-it-works.css';
+@import '../components/why-us.css';
+@import '../components/price-table.css';
 @import '../components/faq.css';
+@import '../components/footer.css';

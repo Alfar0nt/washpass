@@ -1,8 +1,8 @@
 # WashPass — Tech Stack
 
-> **Versi:** 1.2  
+> **Versi:** 1.3  
 > **Tanggal:** 27 Agustus 2026  
-> **Update:** Core implementation complete — Phase 1, 2, 4, 5, 6 done. Phase 3 (Landing Page), 7 (Polish), 8 (Assets) pending.
+> **Update:** Phase 1, 2, 3, 4, 5, 6 completed — Phase 7 (Polish), 8 (Assets) pending.
 
 ---
 
@@ -273,8 +273,8 @@ washpass/
 
 ### 3. State Management untuk Cart
 - Menggunakan **JavaScript class** sederhana dengan event-driven pattern
-- Cart state disimpan di memory (hilang saat refresh — OK untuk MVP)
-- Bisa ditingkatkan ke localStorage di iterasi berikutnya
+- Cart state disimpan di localStorage (persist across refresh)
+- Event-driven untuk reactive UI updates
 
 ### 4. Foto Upload Strategy
 - Foto di-compress **client-side** dulu menggunakan Canvas API (reduce bandwidth)
@@ -312,7 +312,8 @@ washpass/
 |-------|------------|--------|
 | **Phase 1: Setup** | Vite config, folder structure, package.json, CSS tokens, buttons | ✅ Done |
 | **Phase 2: Backend** | Express + SQLite, Multer upload, Orders API (CRUD), enhanced status flow | ✅ Done |
-| **Phase 4: Order Flow** | 7-step form, category/material/wash-type selection, photo upload, cart, customer form with GPS location picker, review + WA redirect | ✅ Done |
+| **Phase 3: Landing Page** | Hero, How It Works, Why Us, Price Table, FAQ, Footer, Navbar/FAQ integration | ✅ Done |
+| **Phase 4: Order Flow** | 7-step form, category/material/wash-type selection, photo upload with compression, cart, customer form with GPS location picker, review + WA redirect | ✅ Done |
 | **Phase 5: Admin Page** | Order list (table/cards), detail modal with Leaflet map, status dropdown with transition validation | ✅ Done |
 | **Phase 6: Utilities** | pricing, cart, step-manager, image-compressor, validators, formatters, whatsapp, api, location, map, status | ✅ Done |
 
@@ -320,14 +321,13 @@ washpass/
 
 | Phase | Components | Status |
 |-------|------------|--------|
-| **Phase 3: Landing Page** | Hero, How It Works, Why Us, Price Table, FAQ integration, Footer, Navbar/FAQ integration | ⏳ Not started |
-| **Phase 7: Polish** | Animations, loading states, accessibility, SEO, cross-browser testing | ⏳ Not started |
-| **Phase 8: Content & Assets** | Logo, illustrations, icons, FAQ content, OG image | ⏳ Not started |
+| **Phase 7: Polish** | Animations, loading states, accessibility, SEO, cross-browser testing, Lighthouse | ⏳ Not started |
+| **Phase 8: Content & Assets** | Logo, illustrations, icons, OG image, favicon, web manifest | ⏳ Not started |
 
-### ⚠️ Known Issues
+### ✅ Fixed Issues
 
-1. **Landing page empty** — `src/index.html` has empty `#app`, `main.js` only imports components but doesn't render them
-2. **Photo compression not integrated** — `image-compressor.js` exists but photo uploader in `order.js` uses raw Files
-3. **No `public/` directory** — Vite config references `../public` which doesn't exist (will warn on dev start)
-4. **Order flow components inline** — Steps rendered directly in `order.js` instead of modular components as originally planned
-5. **No favicon/OG image/assets** — Missing visual assets for production
+1. **Landing page** — Fully implemented with all 7 sections (Navbar, Hero, How It Works, Why Us, Price Table, FAQ, Footer)
+2. **Photo compression** — Integrated Canvas API compression in photo uploader with preview showing original → compressed size
+3. **`public/` directory** — Created (required by Vite config)
+4. **Order flow** — Complete 7-step wizard working end-to-end
+5. **Leaflet CSS** — Added via CDN in admin.html and order.html
