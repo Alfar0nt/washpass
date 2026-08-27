@@ -787,3 +787,25 @@
 **Testing for the user:**
 - Load `/admin` → the modal should NOT appear until a row's "Detail" is clicked
 - Click "Detail" on a row → the modal opens and loads the detail; if the request fails/times out it shows a clear error instead of spinning forever
+
+---
+
+## Next Up / Backlog (Priority Order)
+
+### 1. Fix Map & GPS Bugs (high)
+- **Problem:** Location/map features misbehave, likely because the local dev server runs over `http` (not `https`) — the browser **Geolocation API only works on secure contexts** (`https` or `localhost`).
+- **Tasks:**
+  - Verify/adjust the HTTPS-secure-context check in `src/js/utils/location.js` + `location-picker.js`
+  - Confirm geolocation works on `localhost` (treated as secure) and give a clear user message when blocked (e.g. HTTP on a LAN IP)
+  - Check Leaflet/OSM tile loading on http (mixed-content) and the map render in `order-review` + admin detail
+  - Test the full location flow: allow → reverse geocode (Nominatim) → pin shown in review + admin map
+
+### 2. Improve Overall UI/UX (medium)
+- Polish the whole site experience (landing + order flow + admin), plus specifically:
+  - **FAQ** section — design, accordion behavior, content
+  - **Footer** — layout, links, branding, responsiveness
+- Could span Phase 7 (Polish); keep consistent with design tokens in `variables.css`
+
+### 3. Change Logo & Favicon (low)
+- Replace the current logo mark (👟 emoji) and favicon with a real brand asset
+- Part of Phase 8 (Assets); update wherever the logo/favicon is referenced (landing navbar, order header, HTML `<head>`, etc.)
