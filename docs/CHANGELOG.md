@@ -2,6 +2,62 @@
 
 ---
 
+## [v0.0.21] - 2026-08-27
+
+### Fixed
+- **Admin panel: Images now open in modal popup instead of new tab**:
+  - Clicking on order photos opens a modal overlay (same page)
+  - Fullscreen toggle button included
+  - Prev/Next navigation for multi-photo items
+  - Keyboard support (Arrow Left/Right, Escape to close)
+  - Click outside modal to close
+  - Files: `src/js/components/order-detail.js`, `src/css/components/admin-detail.css`
+
+- **Order flow: Direct cart access from any step**:
+  - Added "Keranjang (X item)" button to Pilih Kategori, Pilih Bahan, and Pilih Tipe Cuci steps
+  - Users can jump to cart at any time without adding more items
+  - Button shows current cart item count
+
+- **Order flow: Free navigation with data persistence**:
+  - Users can freely navigate back/forward between steps
+  - All form data (category, material, wash type, photos, notes) saved to sessionStorage
+  - Navigation back doesn't lose previous selections
+  - Files: `src/js/order.js` — all step render functions
+
+- **Order flow: Step validation before proceeding**:
+  - Steps must be completed before proceeding to next step
+  - Category → Material/WashType → Photos → Cart → Customer → Review
+  - Validation set via `stepManager.setStepValid()` on each completion
+  - Prevents skipping required steps
+
+- **Order flow: Step indicator clickable navigation**:
+  - Users can click on completed steps in the progress bar to jump back
+  - Previously completed steps are clickable (green/active)
+  - Future steps remain disabled
+
+- **Container spacing fixed**:
+  - Added proper padding to prevent content from touching screen edges
+  - Mobile: `padding-top: calc(var(--order-header-height, 64px) + 68px)` on `#stepContent`
+  - Desktop: `padding-top: var(--space-8)` with container padding on sides
+  - Added `.step-content__wrapper` with responsive max-width (768px mobile, 900px desktop)
+
+- **Order flow: Card checkmarks for selected options**:
+  - Category step: Shows ✓ on selected category (Sepatu/Sandal)
+  - Material step: Shows ✓ on selected material
+  - WashType step: Shows ✓ on selected wash type
+  - Checkmarks appear in top-right corner of each card
+
+### Changes
+- Updated tasks.md to v0.0.21 with new bug reports (visual indicator, green checkmark flash)
+- Updated tasks.md to add bugs at top of known issues section
+- Files: `src/js/order.js`, `src/js/components/step-manager.js`, `src/css/pages/order.css`, `src/css/components/*.css`
+
+### Known Issues (v0.0.21) - In Progress
+- **Bug #1**: Visual selection indicator not persisting on all steps when navigating back
+- **Bug #2**: Green checkmark appearing briefly below "Konfirmasi" step when navigating back
+
+---
+
 ## [v0.0.20] - 2026-08-27
 
 ### Fixed

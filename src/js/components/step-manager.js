@@ -14,6 +14,7 @@ export class StepManager {
     this.currentStepIndex = 0;
     this.completedSteps = new Set();
     this.stepElements = new Map();
+    this.stepValidations = new Map();
     this.onStepChange = options.onStepChange || (() => {});
     this.onStepComplete = options.onStepComplete || (() => {});
     
@@ -21,6 +22,24 @@ export class StepManager {
     if (this.container) {
       this.render();
     }
+  }
+
+  setStepValid(stepId, isValid) {
+    this.stepValidations.set(stepId, isValid);
+    const stepEl = this.stepList.querySelector(`[data-step="${stepId}"]`);
+    if (stepEl) {
+      if (isValid) {
+        stepEl.classList.add('step-indicator__step--valid');
+      } else {
+        stepEl.classList.remove('step-indicator__step--valid');
+      }
+    }
+  }
+
+  canProceed() {
+    const currentStep = this.steps[this.currentStepIndex];
+    const isValid = this.stepValidations.get(currentStep.id);
+    return isValid !== false;
   }
 
   render() {
@@ -38,6 +57,19 @@ export class StepManager {
     this.progressBar = this.container.querySelector('#stepProgress');
     this.stepList = this.container.querySelector('#stepList');
     this.updateDisplay();
+    
+    this.bindStepEvents();
+  }
+
+  bindStepEvents() {
+    this.stepList.querySelectorAll('.step-indicator__step').forEach((stepEl, index) => {
+      stepEl.addEventListener('click', () => {
+        const stepId = this.steps[index].id;
+        if (index <= this.currentStepIndex || this.completedSteps.has(stepId)) {
+          this.goToStep(index);
+        }
+      });
+    });
   }
 
   renderStep(step, index) {
@@ -85,6 +117,7 @@ export class StepManager {
       const stepId = el.dataset.step;
       const isActive = index === this.currentStepIndex;
       const isCompleted = this.completedSteps.has(stepId);
+      const isValid = this.stepValidations.get(stepId);
 
       el.classList.remove('step-indicator__step--active', 'step-indicator__step--completed', 'step-indicator__step--future');
       

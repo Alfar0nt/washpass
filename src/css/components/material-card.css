@@ -47,3 +47,20 @@
   margin: 0;
   line-height: 1.4;
 }
+
+.material-card__checkmark {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  background: var(--color-success);
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}

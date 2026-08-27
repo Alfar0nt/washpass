@@ -128,27 +128,48 @@ function renderStep(stepId) {
 }
 
 function renderCategoryStep(container) {
+  const tempItem = JSON.parse(sessionStorage.getItem('washpass_temp_item') || '{}');
+  const selectedCategory = tempItem.category;
+
   container.innerHTML = `
     <div class="step-content">
-      <h2 class="step-title">Pilih Kategori</h2>
-      <p class="step-subtitle">Apa yang ingin Anda cuci hari ini?</p>
-      <div class="category-grid" id="categoryGrid">
-        <button type="button" class="category-card" data-category="shoe">
-          <div class="category-card__icon">👟</div>
-          <h3 class="category-card__title">Sepatu</h3>
-          <p class="category-card__desc">Sneakers, pantofel, boots, dll</p>
-        </button>
-        <button type="button" class="category-card" data-category="sandal">
-          <div class="category-card__icon">🩴</div>
-          <h3 class="category-card__title">Sandal</h3>
-          <p class="category-card__desc">Gunung, jepit, flip-flop, dll</p>
-        </button>
+      <div class="step-content__wrapper">
+        <h2 class="step-title">Pilih Kategori</h2>
+        <p class="step-subtitle">Apa yang ingin Anda cuci hari ini?</p>
+        <div class="category-grid" id="categoryGrid">
+          <button type="button" class="category-card" data-category="shoe" ${selectedCategory === 'shoe' ? 'data-selected="true"' : ''}>
+            <div class="category-card__icon">👟</div>
+            <h3 class="category-card__title">Sepatu</h3>
+            <p class="category-card__desc">Sneakers, pantofel, boots, dll</p>
+            ${selectedCategory === 'shoe' ? '<div class="category-card__checkmark">✓</div>' : ''}
+          </button>
+          <button type="button" class="category-card" data-category="sandal" ${selectedCategory === 'sandal' ? 'data-selected="true"' : ''}>
+            <div class="category-card__icon">🩴</div>
+            <h3 class="category-card__title">Sandal</h3>
+            <p class="category-card__desc">Gunung, jepit, flip-flop, dll</p>
+            ${selectedCategory === 'sandal' ? '<div class="category-card__checkmark">✓</div>' : ''}
+          </button>
+        </div>
+        <div class="step-actions">
+          <button type="button" class="btn btn-outline" id="goToCart">
+            <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            <span>Keranjang (${cart.getTotalItems()} item)</span>
+          </button>
+        </div>
       </div>
     </div>
   `;
 
   container.querySelectorAll('.category-card').forEach(card => {
     card.addEventListener('click', () => selectCategory(card.dataset.category));
+  });
+  
+  container.querySelector('#goToCart')?.addEventListener('click', () => {
+    stepManager.goToStep(STEP_ORDER.indexOf('cart'));
   });
 }
 
@@ -160,6 +181,7 @@ function selectCategory(category) {
   }
   sessionStorage.setItem('washpass_temp_item', JSON.stringify(tempItem));
 
+  stepManager.setStepValid('category', true);
   stepManager.completeCurrentStep();
   // Sandal has no material step — skip straight to wash type selection
   if (category === 'sandal') {
@@ -169,27 +191,41 @@ function selectCategory(category) {
 
 function renderMaterialStep(container) {
   import('./config/pricing.js').then(({ MATERIALS }) => {
+    const tempItem = JSON.parse(sessionStorage.getItem('washpass_temp_item') || '{}');
+    const selectedMaterial = tempItem.material;
+
     container.innerHTML = `
       <div class="step-content">
-        <h2 class="step-title">Pilih Bahan Sepatu</h2>
-        <p class="step-subtitle">Pilih jenis bahan sepatu Anda untuk harga yang tepat</p>
-        <div class="material-grid" id="materialGrid">
-          ${MATERIALS.map(m => `
-            <button type="button" class="material-card" data-material="${m.id}">
-              <div class="material-card__icon">${m.icon}</div>
-              <h3 class="material-card__title">${m.name}</h3>
-              <p class="material-card__desc">${m.description}</p>
+        <div class="step-content__wrapper">
+          <h2 class="step-title">Pilih Bahan Sepatu</h2>
+          <p class="step-subtitle">Pilih jenis bahan sepatu Anda untuk harga yang tepat</p>
+          <div class="material-grid" id="materialGrid">
+            ${MATERIALS.map(m => `
+              <button type="button" class="material-card" data-material="${m.id}" ${selectedMaterial === m.id ? 'data-selected="true"' : ''}>
+                <div class="material-card__icon">${m.icon}</div>
+                <h3 class="material-card__title">${m.name}</h3>
+                <p class="material-card__desc">${m.description}</p>
+                ${selectedMaterial === m.id ? '<div class="material-card__checkmark">✓</div>' : ''}
+              </button>
+            `).join('')}
+          </div>
+          <div class="step-actions">
+            <button type="button" class="btn btn-outline" id="backToCategory">
+              <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+              <span>Kembali</span>
             </button>
-          `).join('')}
-        </div>
-        <div class="step-actions">
-          <button type="button" class="btn btn-outline" id="backToCategory">
-            <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-            <span>Kembali</span>
-          </button>
+            <button type="button" class="btn btn-outline" id="goToCart">
+              <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              <span>Keranjang (${cart.getTotalItems()} item)</span>
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -198,12 +234,14 @@ function renderMaterialStep(container) {
       card.addEventListener('click', () => selectMaterial(card.dataset.material));
     });
     container.querySelector('#backToCategory')?.addEventListener('click', () => stepManager.previous());
+    container.querySelector('#goToCart')?.addEventListener('click', () => stepManager.goToStep(STEP_ORDER.indexOf('cart')));
   });
 }
 
 function selectMaterial(material) {
   const tempItem = { category: 'shoe', material };
   sessionStorage.setItem('washpass_temp_item', JSON.stringify(tempItem));
+  stepManager.setStepValid('material', true);
   stepManager.completeCurrentStep();
 }
 
@@ -212,35 +250,47 @@ function renderWashTypeStep(container) {
     const tempItem = JSON.parse(sessionStorage.getItem('washpass_temp_item') || '{}');
     const isSandal = tempItem.category === 'sandal';
     const material = tempItem.material;
+    const selectedWashType = tempItem.wash_type;
 
     container.innerHTML = `
       <div class="step-content">
-        <h2 class="step-title">Pilih Tipe Pencucian</h2>
-        <p class="step-subtitle">${isSandal ? 'Sandal' : 'Sepatu ' + material} — Pilih jenis pencucian</p>
-        <div class="wash-type-grid" id="washTypeGrid">
-          ${WASH_TYPES.map(w => {
-            const price = isSandal ? PRICING.sandal[w.id] : getPrice('shoe', material, w.id);
-            return `
-              <button type="button" class="wash-type-card" data-wash-type="${w.id}">
-                <div class="wash-type-card__icon">${w.icon}</div>
-                <h3 class="wash-type-card__title">${w.name}</h3>
-                <p class="wash-type-card__desc">${w.description}</p>
-                <div class="wash-type-card__meta">
-                  <span class="wash-type-card__duration">⏱️ ${w.duration}</span>
-                  <span class="wash-type-card__price">${formatCurrency(price)}</span>
-                </div>
-              </button>
-            `;
-          }).join('')}
-        </div>
-        <div class="step-actions">
-          <button type="button" class="btn btn-outline" id="backToPrevious">
-            <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-            <span>Kembali</span>
-          </button>
+        <div class="step-content__wrapper">
+          <h2 class="step-title">Pilih Tipe Pencucian</h2>
+          <p class="step-subtitle">${isSandal ? 'Sandal' : 'Sepatu ' + material} — Pilih jenis pencucian</p>
+          <div class="wash-type-grid" id="washTypeGrid">
+            ${WASH_TYPES.map(w => {
+              const price = isSandal ? PRICING.sandal[w.id] : getPrice('shoe', material, w.id);
+              return `
+                <button type="button" class="wash-type-card" data-wash-type="${w.id}" ${selectedWashType === w.id ? 'data-selected="true"' : ''}>
+                  <div class="wash-type-card__icon">${w.icon}</div>
+                  <h3 class="wash-type-card__title">${w.name}</h3>
+                  <p class="wash-type-card__desc">${w.description}</p>
+                  <div class="wash-type-card__meta">
+                    <span class="wash-type-card__duration">⏱️ ${w.duration}</span>
+                    <span class="wash-type-card__price">${formatCurrency(price)}</span>
+                  </div>
+                  ${selectedWashType === w.id ? '<div class="wash-type-card__checkmark">✓</div>' : ''}
+                </button>
+              `;
+            }).join('')}
+          </div>
+          <div class="step-actions">
+            <button type="button" class="btn btn-outline" id="backToPrevious">
+              <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+              <span>Kembali</span>
+            </button>
+            <button type="button" class="btn btn-outline" id="goToCart">
+              <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              <span>Keranjang (${cart.getTotalItems()} item)</span>
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -249,6 +299,7 @@ function renderWashTypeStep(container) {
       card.addEventListener('click', () => selectWashType(card.dataset.washType));
     });
     container.querySelector('#backToPrevious')?.addEventListener('click', () => stepManager.previous());
+    container.querySelector('#goToCart')?.addEventListener('click', () => stepManager.goToStep(STEP_ORDER.indexOf('cart')));
   });
 }
 
@@ -261,23 +312,26 @@ function selectWashType(washType) {
     ? PRICING.sandal[washType] 
     : PRICING.shoe[tempItem.material]?.[washType] || 0;
   sessionStorage.setItem('washpass_temp_item', JSON.stringify(tempItem));
+  stepManager.setStepValid('washType', true);
   stepManager.completeCurrentStep();
 }
 
 function renderPhotosStep(container) {
   container.innerHTML = `
     <div class="step-content">
-      <h2 class="step-title">Upload Foto & Catatan</h2>
-      <p class="step-subtitle">Tambahkan 1-3 foto sepatu/sandal untuk tim kami menilai kondisi</p>
-      <div class="photo-uploader" id="photoUploader"></div>
-      <div class="photo-preview" id="photoPreview"></div>
-      <div class="form-group">
-        <label for="itemNotes" class="form-label">Catatan Khusus (Opsional)</label>
-        <textarea id="itemNotes" class="form-textarea" rows="3" placeholder="Contoh: Ada noda tinta di sisi kiri, tali hilang 1 sisi"></textarea>
-      </div>
-      <div class="step-actions">
-        <button type="button" class="btn btn-outline" id="backToWashType">Kembali</button>
-        <button type="button" class="btn btn-primary" id="addToCart">Tambah ke Keranjang</button>
+      <div class="step-content__wrapper">
+        <h2 class="step-title">Upload Foto & Catatan</h2>
+        <p class="step-subtitle">Tambahkan 1-3 foto sepatu/sandal untuk tim kami menilai kondisi</p>
+        <div class="photo-uploader" id="photoUploader"></div>
+        <div class="photo-preview" id="photoPreview"></div>
+        <div class="form-group">
+          <label for="itemNotes" class="form-label">Catatan Khusus (Opsional)</label>
+          <textarea id="itemNotes" class="form-textarea" rows="3" placeholder="Contoh: Ada noda tinta di sisi kiri, tali hilang 1 sisi"></textarea>
+        </div>
+        <div class="step-actions">
+          <button type="button" class="btn btn-outline" id="backToWashType">Kembali</button>
+          <button type="button" class="btn btn-primary" id="addToCart">Tambah ke Keranjang</button>
+        </div>
       </div>
     </div>
   `;
@@ -453,6 +507,7 @@ function addToCart() {
   cart.addItem(item);
   currentPhotos = [];
   sessionStorage.removeItem('washpass_temp_item');
+  stepManager.setStepValid('photos', true);
   stepManager.completeCurrentStep();
 }
 
@@ -465,19 +520,20 @@ function renderCartStep(container) {
 
   container.innerHTML = `
     <div class="step-content">
-      <h2 class="step-title">Keranjang Pesanan</h2>
-      <p class="step-subtitle">${totalItems} item • ${formatCurrency(totalPrice)}</p>
-      
-      ${!isValid ? `
-        <div class="cart-warning">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          <span>${validationMessage}</span>
-        </div>
-      ` : ''}
+      <div class="step-content__wrapper">
+        <h2 class="step-title">Keranjang Pesanan</h2>
+        <p class="step-subtitle">${totalItems} item • ${formatCurrency(totalPrice)}</p>
+        
+        ${!isValid ? `
+          <div class="cart-warning">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span>${validationMessage}</span>
+          </div>
+        ` : ''}
 
       <div class="cart-items" id="cartItems">
         ${items.length === 0 ? `
@@ -520,6 +576,7 @@ function renderCartStep(container) {
             <polyline points="12 5 19 12 12 19" />
           </svg>
         </button>
+      </div>
       </div>
     </div>
   `;
@@ -582,9 +639,11 @@ function renderCustomerStep(container) {
 
   container.innerHTML = `
     <div class="step-content">
-      <h2 class="step-title">Data Customer</h2>
-      <p class="step-subtitle">Isi data diri untuk pickup & komunikasi via WhatsApp</p>
-      <div id="customerFormContainer"></div>
+      <div class="step-content__wrapper">
+        <h2 class="step-title">Data Customer</h2>
+        <p class="step-subtitle">Isi data diri untuk pickup & komunikasi via WhatsApp</p>
+        <div id="customerFormContainer"></div>
+      </div>
     </div>
   `;
 

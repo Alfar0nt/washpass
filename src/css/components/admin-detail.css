@@ -329,6 +329,112 @@
   max-width: 300px;
 }
 
+/* Photo Modal Styles */
+.photo-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn var(--transition-fast);
+}
+
+.photo-modal {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+
+.photo-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4) var(--space-6);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+.photo-modal__counter {
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.photo-modal__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.photo-modal__btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.photo-modal__btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.photo-modal__content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  position: relative;
+}
+
+.photo-modal__img {
+  max-width: 100%;
+  max-height: calc(100vh - 120px);
+  object-fit: contain;
+  border-radius: var(--radius-md);
+}
+
+.photo-modal__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: var(--radius-full);
+  transition: background var(--transition-fast);
+  z-index: 1;
+}
+
+.photo-modal__nav:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.photo-modal__nav--prev {
+  left: var(--space-4);
+}
+
+.photo-modal__nav--next {
+  right: var(--space-4);
+}
+
+.photo-modal:fullscreen {
+  background: rgba(0, 0, 0, 0.95);
+}
+
+.photo-modal:fullscreen .photo-modal__header {
+  background: rgba(0, 0, 0, 0.7);
+}
+
 @media (max-width: 767px) {
   .admin-modal {
     max-height: 95vh;
@@ -342,5 +448,18 @@
   
   .admin-detail__status-selector select {
     width: 100%;
+  }
+
+  .photo-modal__nav {
+    width: 40px;
+    height: 40px;
+  }
+
+  .photo-modal__nav--prev {
+    left: var(--space-2);
+  }
+
+  .photo-modal__nav--next {
+    right: var(--space-2);
   }
 }

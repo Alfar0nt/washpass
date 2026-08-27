@@ -277,10 +277,10 @@ export class OrderDetail {
           <div class="admin-detail__item-row">
             <span class="admin-detail__item-label">Foto:</span>
             <div class="admin-detail__photos">
-              ${item.photos.map(photo => `
-                <a href="${getPhotoUrl(photo.filename)}" target="_blank" rel="noopener" class="admin-detail__photo-link">
+              ${item.photos.map((photo, photoIndex) => `
+                <button type="button" class="admin-detail__photo-link" data-photo-index="${photoIndex}" data-item-index="${index}">
                   <img src="${getPhotoUrl(photo.filename)}" alt="${this.escapeHtml(photo.original_name)}" class="admin-detail__photo" loading="lazy">
-                </a>
+                </button>
               `).join('')}
             </div>
           </div>
@@ -302,6 +302,131 @@ export class OrderDetail {
         }
       });
     }
+
+    // Bind photo click events for modal viewer
+    this.content.querySelectorAll('.admin-detail__photo-link').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const itemIndex = parseInt(btn.dataset.itemIndex);
+        const photoIndex = parseInt(btn.dataset.photoIndex);
+        this.openPhotoModal(itemIndex, photoIndex);
+      });
+    });
+  }
+
+  openPhotoModal(itemIndex, photoIndex) {
+    const items = this.order.items || [];
+    const item = items[itemIndex];
+    if (!item || !item.photos || item.photos.length === 0) return;
+
+    const photos = item.photos;
+    let currentIndex = photoIndex;
+
+    // Create modal overlay
+    const modal = document.createElement('div');
+    modal.className = 'photo-modal-overlay';
+    modal.innerHTML = `
+      <div class="photo-modal">
+        <div class="photo-modal__header">
+          <span class="photo-modal__counter">${currentIndex + 1} / ${photos.length}</span>
+          <div class="photo-modal__actions">
+            <button type="button" class="photo-modal__btn photo-modal__btn--fullscreen" aria-label="Fullscreen">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+              </svg>
+            </button>
+            <button type="button" class="photo-modal__btn photo-modal__btn--close" aria-label="Tutup">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="photo-modal__content">
+          ${photos.length > 1 ? `
+            <button type="button" class="photo-modal__nav photo-modal__nav--prev" aria-label="Sebelumnya">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+            </button>
+          ` : ''}
+          <img src="${getPhotoUrl(photos[currentIndex].filename)}" alt="${this.escapeHtml(photos[currentIndex].original_name)}" class="photo-modal__img">
+          ${photos.length > 1 ? `
+            <button type="button" class="photo-modal__nav photo-modal__nav--next" aria-label="Selanjutnya">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </button>
+          ` : ''}
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+
+    const updatePhoto = (newIndex) => {
+      currentIndex = newIndex;
+      const img = modal.querySelector('.photo-modal__img');
+      img.src = getPhotoUrl(photos[currentIndex].filename);
+      img.alt = this.escapeHtml(photos[currentIndex].original_name);
+      modal.querySelector('.photo-modal__counter').textContent = `${currentIndex + 1} / ${photos.length}`;
+    };
+
+    // Event handlers
+    const closeBtn = modal.querySelector('.photo-modal__btn--close');
+    const fullscreenBtn = modal.querySelector('.photo-modal__btn--fullscreen');
+    const prevBtn = modal.querySelector('.photo-modal__nav--prev');
+    const nextBtn = modal.querySelector('.photo-modal__nav--next');
+
+    const closeModal = () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+      modal.remove();
+      document.body.style.overflow = '';
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal || e.target.classList.contains('photo-modal__content')) {
+        closeModal();
+      }
+    });
+
+    fullscreenBtn.addEventListener('click', () => {
+      const photoModal = modal.querySelector('.photo-modal');
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        photoModal.requestFullscreen();
+      }
+    });
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        updatePhoto(currentIndex === 0 ? photos.length - 1 : currentIndex - 1);
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        updatePhoto(currentIndex === photos.length - 1 ? 0 : currentIndex + 1);
+      });
+    }
+
+    // Keyboard navigation
+    const handleKeydown = (e) => {
+      if (e.key === 'Escape') closeModal();
+      if (e.key === 'ArrowLeft' && photos.length > 1) updatePhoto(currentIndex === 0 ? photos.length - 1 : currentIndex - 1);
+      if (e.key === 'ArrowRight' && photos.length > 1) updatePhoto(currentIndex === photos.length - 1 ? 0 : currentIndex + 1);
+    };
+    document.addEventListener('keydown', handleKeydown);
+
+    // Store handler reference for cleanup
+    modal._handleKeydown = handleKeydown;
   }
 
   async updateStatus(newStatus) {

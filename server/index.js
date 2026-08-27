@@ -41,8 +41,8 @@ app.use((err, req, res, next) => {
 
 function startServer(port) {
   return new Promise((resolve, reject) => {
-    const server = app.listen(port, () => {
-      console.log(`Server running on http://localhost:${port} (${NODE_ENV})`);
+    const server = app.listen(port, '0.0.0.0', () => {
+      console.log(`Server running on http://0.0.0.0:${port} (${NODE_ENV})`);
       resolve(server);
     }).on('error', (error) => {
       if (error.code === 'EADDRINUSE') {
