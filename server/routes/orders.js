@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import db from '../db/database.js';
+import { getDatabase } from '../db/database.js';
 import { uploadMiddleware } from '../middleware/upload.js';
 
 const router = Router();
@@ -16,7 +16,7 @@ function validateStatusTransition(currentStatus, newStatus) {
   return STATUS_TRANSITIONS[currentStatus]?.includes(newStatus) ?? false;
 }
 
-router.post('/', uploadMiddleware, (req, res) => {
+router.post('/', uploadMiddleware, async (req, res) => {
   try {
     const {
       customer_name,
@@ -39,12 +39,12 @@ router.post('/', uploadMiddleware, (req, res) => {
       return res.status(400).json({ error: 'Minimum 2 items required' });
     }
 
-    const orderStmt = db.prepare(`
+    const db = await getDatabase();
+    
+    const result = await db.run(`
       INSERT INTO orders (customer_name, whatsapp, address, address_note, latitude, longitude, total_price, total_items, status)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')
-    `);
-
-    const result = orderStmt.run(
+    `, [
       customer_name,
       whatsapp,
       address,
@@ -53,16 +53,16 @@ router.post('/', uploadMiddleware, (req, res) => {
       longitude ? parseFloat(longitude) : null,
       parseInt(total_price),
       parseInt(total_items)
-    );
+    ]);
 
-    const orderId = result.lastInsertRowid;
+    const orderId = result.lastID;
 
-    const itemStmt = db.prepare(`
+    const itemStmt = await db.prepare(`
       INSERT INTO order_items (order_id, category, material, wash_type, price, notes)
       VALUES (?, ?, ?, ?, ?, ?)
     `);
 
-    const photoStmt = db.prepare(`
+    const photoStmt = await db.prepare(`
       INSERT INTO order_photos (order_item_id, filename, original_name, size_bytes)
       VALUES (?, ?, ?, ?)
     `);
@@ -71,7 +71,7 @@ router.post('/', uploadMiddleware, (req, res) => {
     let fileIndex = 0;
 
     for (const item of parsedItems) {
-      const itemResult = itemStmt.run(
+      const itemResult = await itemStmt.run(
         orderId,
         item.category,
         item.material || null,
@@ -80,17 +80,20 @@ router.post('/', uploadMiddleware, (req, res) => {
         item.notes || null
       );
 
-      const itemId = itemResult.lastInsertRowid;
+      const itemId = itemResult.lastID;
 
       const photoCount = item.photos?.length || 0;
       for (let i = 0; i < photoCount; i++) {
         if (fileIndex < files.length) {
           const file = files[fileIndex];
-          photoStmt.run(itemId, file.filename, file.originalname, file.size);
+          await photoStmt.run(itemId, file.filename, file.originalname, file.size);
           fileIndex++;
         }
       }
     }
+
+    await itemStmt.finalize();
+    await photoStmt.finalize();
 
     res.json({ orderId, status: 'success' });
   } catch (error) {
@@ -99,9 +102,11 @@ router.post('/', uploadMiddleware, (req, res) => {
   }
 });
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const { status } = req.query;
+    const db = await getDatabase();
+    
     let query = `
       SELECT o.*, 
         (SELECT COUNT(*) FROM order_items WHERE order_id = o.id) as item_count
@@ -116,7 +121,7 @@ router.get('/', (req, res) => {
 
     query += ' ORDER BY o.created_at DESC';
 
-    const orders = db.prepare(query).all(...params);
+    const orders = await db.all(query, ...params);
     res.json(orders);
   } catch (error) {
     console.error('Error fetching orders:', error);
@@ -124,19 +129,20 @@ router.get('/', (req, res) => {
   }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    const db = await getDatabase();
     
-    const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(id);
+    const order = await db.get('SELECT * FROM orders WHERE id = ?', id);
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
 
-    const items = db.prepare('SELECT * FROM order_items WHERE order_id = ?').all(id);
+    const items = await db.all('SELECT * FROM order_items WHERE order_id = ?', id);
     
     for (const item of items) {
-      item.photos = db.prepare('SELECT * FROM order_photos WHERE order_item_id = ?').all(item.id);
+      item.photos = await db.all('SELECT * FROM order_photos WHERE order_item_id = ?', item.id);
     }
 
     res.json({ ...order, items });
@@ -146,7 +152,7 @@ router.get('/:id', (req, res) => {
   }
 });
 
-router.patch('/:id/status', (req, res) => {
+router.patch('/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -155,7 +161,8 @@ router.patch('/:id/status', (req, res) => {
       return res.status(400).json({ error: 'Invalid status' });
     }
 
-    const order = db.prepare('SELECT status FROM orders WHERE id = ?').get(id);
+    const db = await getDatabase();
+    const order = await db.get('SELECT status FROM orders WHERE id = ?', id);
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
@@ -166,8 +173,7 @@ router.patch('/:id/status', (req, res) => {
       });
     }
 
-    db.prepare('UPDATE orders SET status = ?, updated_at = datetime("now", "localtime") WHERE id = ?')
-      .run(status, id);
+    await db.run('UPDATE orders SET status = ?, updated_at = datetime("now", "localtime") WHERE id = ?', [status, id]);
 
     res.json({ success: true, status });
   } catch (error) {

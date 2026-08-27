@@ -3,7 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import ordersRouter from './routes/orders.js';
-import { initDatabase } from './db/schema.js';
+import { initDatabase, closeDatabase } from './db/schema.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,7 +12,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-initDatabase();
+// Initialize database
+initDatabase().catch(console.error);
 
 app.use(cors());
 app.use(express.json());
@@ -43,9 +44,11 @@ const server = app.listen(PORT, () => {
 
 function gracefulShutdown() {
   console.log('Shutting down gracefully...');
-  server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
+  closeDatabase().then(() => {
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
   });
   
   setTimeout(() => {

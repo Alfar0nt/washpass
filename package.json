@@ -1,25 +1,26 @@
 {
   "name": "washpass",
-  "version": "1.0.0",
+  "version": "v0.0.6",
   "description": "Website jasa pencucian sepatu dan sandal dengan sistem pick-up → cuci → antar kembali",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "dev:server": "node server/index.js",
-    "dev:all": "concurrently \"npm run dev\" \"npm run dev:server\"",
+    "dev:all": "concurrently \"pnpm run dev\" \"pnpm run dev:server\"",
     "build": "vite build",
     "start": "NODE_ENV=production node server/index.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "better-sqlite3": "^9.4.3",
-    "multer": "^1.4.5-lts.1",
     "cors": "^2.8.5",
-    "uuid": "^9.0.1",
-    "leaflet": "^1.9.4"
+    "express": "^4.19.2",
+    "leaflet": "^1.9.4",
+    "multer": "^1.4.5-lts.1",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "vite": "^5.2.0",
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "vite": "^5.2.0"
   }
 }

@@ -1,8 +1,8 @@
 # WashPass — Tech Stack
 
-> **Versi:** 1.3  
+> **Versi:** 1.4  
 > **Tanggal:** 27 Agustus 2026  
-> **Update:** Phase 1, 2, 3, 4, 5, 6 completed — Phase 7 (Polish), 8 (Assets) pending.
+> **Update:** Phase 1-6 complete, build tested. Switched to `sqlite3` + `sqlite` (async) for Node.js 26 compatibility.
 
 ---
 
@@ -20,7 +20,7 @@
 |----------|---------|--------|
 | **Runtime** | Node.js | Sama dengan frontend tooling (Vite), satu ekosistem |
 | **Server** | Express.js | Paling populer, minimalis, banyak middleware |
-| **Database** | SQLite (via `better-sqlite3`) | File-based, zero-config, tidak perlu install DB server terpisah. Sangat ringan, cocok untuk volume kecil-sedang |
+| **Database** | SQLite (via `sqlite3` + `sqlite`) | File-based, zero-config, async/await API, kompatibel Node.js 26+ |
 | **File Upload** | Multer | Middleware Express untuk handle `multipart/form-data` |
 | **File Storage** | Filesystem (folder `uploads/`) | Simpel, tidak perlu cloud storage untuk MVP |
 | **CORS** | cors (npm) | Untuk development (frontend & backend di port berbeda) |
@@ -28,9 +28,11 @@
 ### Mengapa SQLite?
 - **Zero configuration** — Tidak perlu install MySQL/PostgreSQL, tidak perlu manage service
 - **File-based** — Database adalah 1 file `.db`, mudah di-backup (copy file saja)
-- **Sangat ringan** — Library `better-sqlite3` ~3MB, synchronous API (tidak perlu async/await)
+- **Sangat ringan** — Library `sqlite3` ~5MB, async API
 - **Cukup untuk skala ini** — Hingga ribuan order tidak masalah
 - **Portable** — Bisa dipindah antar server dengan mudah
+
+> **Catatan:** Beralih dari `better-sqlite3` (sync) ke `sqlite3` + `sqlite` (async) karena `better-sqlite3` belum support Node.js 24+ (V8 API changes). `sqlite3` + `sqlite` wrapper menyediakan promise-based API yang modern dan kompatibel.
 
 ## Styling
 
@@ -160,7 +162,8 @@ washpass/
 │   │       ├── formatters.js       # Currency formatting, etc.
 │   │       ├── location.js         # Geolocation API wrapper
 │   │       ├── map.js              # Leaflet map initialization
-│   │       └── status.js           # Order status constants & helpers
+│   │       ├── status.js           # Order status constants & helpers
+│   │       └── navbar-height.js    # Dynamic navbar height offset (ResizeObserver)
 │   └── assets/
 │       ├── images/
 │       ├── icons/
@@ -331,3 +334,5 @@ washpass/
 3. **`public/` directory** — Created (required by Vite config)
 4. **Order flow** — Complete 7-step wizard working end-to-end
 5. **Leaflet CSS** — Added via CDN in admin.html and order.html
+6. **Order page blank page** — Added missing `stepContent` container (`<main id="stepContent">`) in `order.js` init()
+7. **Landing page mobile navbar** — Dynamic height offset calculation using ResizeObserver + body paddingTop; fixed mobile content blocking on scroll

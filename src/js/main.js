@@ -5,6 +5,7 @@ import { initHowItWorks } from './components/how-it-works.js';
 import { initWhyUs } from './components/why-us.js';
 import { initPriceTable } from './components/price-table.js';
 import { initFooter } from './components/footer.js';
+import { initNavbarHeightOffset } from './utils/navbar-height.js';
 
 function init() {
   const app = document.getElementById('app');
@@ -22,6 +23,7 @@ function init() {
   `;
 
   initNavbar(document.getElementById('navbar'));
+  initNavbarHeightOffset('.navbar');
   initHero(document.getElementById('hero'));
   initHowItWorks(document.getElementById('how-it-works'));
   initWhyUs(document.getElementById('why-us'));

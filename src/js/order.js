@@ -30,6 +30,11 @@ stepIndicatorContainer.id = 'stepIndicator';
 app.prepend(stepIndicatorContainer);
 
 function init() {
+  const contentContainer = document.createElement('main');
+  contentContainer.id = 'stepContent';
+  contentContainer.setAttribute('role', 'main');
+  app.appendChild(contentContainer);
+
   stepManager = initStepManager(stepIndicatorContainer, {
     onStepChange: handleStepChange,
     onStepComplete: handleStepComplete,
@@ -589,17 +594,6 @@ async function handleOrderSubmit() {
     alert('Gagal mengirim pesanan: ' + error.message);
     orderReview.setSubmitting(false);
   }
-}
-
-function getMaterialLabel(material) {
-  const labels = {
-    'canvas': 'Kanvas / Textile',
-    'mesh-knit': 'Mesh / Knit',
-    'leather': 'Kulit Asli / Sintetis',
-    'suede-nubuck': 'Suede / Nubuck',
-    'rubber-eva': 'Karet / EVA / Foam',
-  };
-  return labels[material] || material;
 }
 
 if (document.readyState === 'loading') {

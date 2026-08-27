@@ -72,6 +72,8 @@
 - [x] CTA button "Pesan Sekarang"
 - [x] Smooth scroll ke section
 - [x] **Integrated into landing page**
+- [x] **Dynamic height offset calculation (JS) — ResizeObserver + body paddingTop**
+- [x] **Fixed mobile content blocking on scroll**
 
 ### 3.2 Hero Section
 - [x] Background gradient / pattern
@@ -165,6 +167,11 @@
 - [x] Validasi minimal 2 pasang
 - [x] Pesan warning jika kurang dari 2
 - [x] Tombol "Tambah Item Lain" → kembali ke step 1
+
+### 4.7 **Fixed: Order Page Blank Page Issue**
+- [x] Added missing `stepContent` container (`<main id="stepContent">`) in `order.js` init()
+- [x] Container created dynamically and appended to `#app` before rendering steps
+- [x] All 7 steps now render correctly
 - [x] Kalkulasi total harga
 - [x] Tombol "Lanjut ke Data Diri"
 

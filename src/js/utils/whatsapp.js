@@ -1,6 +1,6 @@
 import { formatCurrency } from './formatters.js';
 
-const WHATSAPP_NUMBER = '6281234567890'; // Ganti dengan nomor WA bisnis
+let WHATSAPP_NUMBER = '6281234567890'; // Ganti dengan nomor WA bisnis
 
 export function getWhatsAppNumber() {
   return WHATSAPP_NUMBER;

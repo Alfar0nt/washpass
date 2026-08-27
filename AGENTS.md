@@ -6,7 +6,7 @@
 ## Tech Stack (from `.ai/tech-stack.md`)
 - **Frontend Build**: Vite (vanilla JS, ES Modules)
 - **Backend**: Express.js (Node.js)
-- **Database**: SQLite via `better-sqlite3` (file-based, zero-config)
+- **Database**: SQLite via `sqlite3` + `sqlite` (async wrapper, Node.js 26 compatible)
 - **File Upload**: Multer (server-side) + Canvas API compression (client-side)
 - **Maps**: Leaflet.js + OpenStreetMap
 - **Location**: Browser Geolocation API + Nominatim reverse geocoding
@@ -145,3 +145,5 @@ Production:
 - **Photo compression integrated** — Canvas API compression in photo uploader
 - **`public/` directory** — Exists (required by Vite config)
 - **Order flow steps inline** — Steps rendered directly in `order.js` instead of modular components
+- **Order page blank page fixed** — Added missing `stepContent` container in `order.js` init()
+- **Landing page mobile navbar fixed** — Dynamic height offset using ResizeObserver + body paddingTop

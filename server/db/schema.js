@@ -1,4 +1,4 @@
-import db from './database.js';
+import { getDatabase, closeDatabase } from './database.js';
 
 const schema = `
 CREATE TABLE IF NOT EXISTS orders (
@@ -42,11 +42,10 @@ CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX IF NOT EXISTS idx_order_photos_order_item_id ON order_photos(order_item_id);
 `;
 
-export function initDatabase() {
-  db.exec(schema);
+export async function initDatabase() {
+  const db = await getDatabase();
+  await db.exec(schema);
   console.log('Database initialized successfully');
 }
 
-export function getDatabase() {
-  return db;
-}
+export { getDatabase, closeDatabase };
