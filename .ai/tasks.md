@@ -336,6 +336,14 @@
 - Container spacing fixed for better mobile/desktop layout
 - Files: `src/js/order.js`, `src/js/components/step-manager.js`
 
+**Admin Panel (Mobile Fix):**
+- Detail pesanan modal now appears as bottom sheet on mobile (anchored to bottom)
+- Drag handle indicator added for visual clarity
+- Reduced max-height to 85vh on mobile
+- All spacing compacted: modal header, content padding, detail gaps, section gaps, item padding, summary rows, status update area
+- Admin header and main content have better mobile spacing
+- Files: `src/css/components/admin-detail.css`, `src/css/global.css`
+
 ---
 
 ## Known Issues / Bugs ⚠️

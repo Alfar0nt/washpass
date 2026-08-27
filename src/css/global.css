@@ -241,3 +241,18 @@ small, .text-xs {
   padding: var(--space-8) 0;
   min-height: calc(100vh - 80px);
 }
+
+@media (max-width: 767px) {
+  .admin-header__content {
+    padding: var(--space-3) 0;
+  }
+
+  .admin-header__brand span {
+    font-size: var(--text-base);
+  }
+
+  .admin-main {
+    padding: var(--space-4) 0;
+    min-height: calc(100vh - 60px);
+  }
+}

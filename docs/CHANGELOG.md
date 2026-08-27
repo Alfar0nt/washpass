@@ -41,6 +41,15 @@
   - Desktop: `padding-top: var(--space-8)` with container padding on sides
   - Added `.step-content__wrapper` with responsive max-width (768px mobile, 900px desktop)
 
+- **Admin panel: Mobile detail modal alignment fixed**:
+  - Detail pesanan modal now appears as bottom sheet on mobile (anchored to bottom)
+  - Drag handle indicator added for visual clarity
+  - Reduced max-height to 85vh on mobile for better visibility
+  - Tighter padding and spacing throughout modal for mobile readability
+  - Header, sections, items, summary, and status update all compacted
+  - Admin header and main content have better mobile spacing
+  - Files: `src/css/components/admin-detail.css`, `src/css/global.css`
+
 - **Order flow: Card checkmarks for selected options**:
   - Category step: Shows ✓ on selected category (Sepatu/Sandal)
   - Material step: Shows ✓ on selected material
