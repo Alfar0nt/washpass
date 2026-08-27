@@ -2,7 +2,7 @@
 
 > **Versi:** 0.0.21  
 > **Tanggal:** 27 Agustus 2026  
-> **Status:** Phase 1-6 Completed — Phase 7, 8 Remaining  
+> **Status:** Phase 1-6 Completed — Phase 7, 8, 9 Remaining  
 > **Update:** Admin image modal + direct cart access + step validation
 
 ---
@@ -288,6 +288,81 @@
 
 ---
 
+## Phase 9: Payment Gateway (Midtrans) ⏳ **PENDING**
+
+### 9.1 Backend Integration
+- [ ] Install `midtrans-client` npm package
+- [ ] Create `server/config/midtrans.js` — Midtrans client initialization (server key, client key, isProduction flag)
+- [ ] Create `server/routes/payment.js` — Midtrans payment routes:
+  - `POST /api/payment/create` — Create Snap transaction (generate snap token)
+  - `POST /api/payment/notification` — Webhook endpoint for Midtrans HTTP notifications
+  - `GET /api/payment/status/:orderId` — Check transaction status
+- [ ] Add `payment_status` column to `orders` table (`unpaid`, `paid`, `expired`, `failed`)
+- [ ] Add `snap_token` column to `orders` table (store Midtrans snap token)
+- [ ] Update `server/routes/orders.js` — Return `payment_status` in order responses
+
+### 9.2 Payment Flow (Snap Redirect)
+- [ ] After order review step, create Snap transaction via `POST /api/payment/create`
+- [ ] Redirect user to Midtrans Snap payment page (`window.location = snap.redirect_url`)
+- [ ] User selects payment method on Midtrans page (QRIS, GoPay, ShopeePay, Dana, VA, etc.)
+- [ ] After payment, Midtrans redirects back to WashPass success page
+- [ ] Create `src/payment-success.html` — Payment success/failure page with order summary
+- [ ] Handle `callback` and `finish` redirect URLs from Midtrans
+
+### 9.3 Webhook Handler
+- [ ] Receive HTTP notification from Midtrans (`POST /api/payment/notification`)
+- [ ] Verify notification authenticity (Midtrans signature validation)
+- [ ] Update order `payment_status` based on notification:
+  - `settlement` → `paid`
+  - `pending` → `unpaid`
+  - `expire` → `expired`
+  - `cancel` / `deny` → `failed`
+- [ ] Update order `status` to `picked_up` when payment is `paid`
+
+### 9.4 Order Flow Update
+- [ ] Modify review step: add "Bayar Sekarang" button (primary CTA)
+- [ ] Add "Kirim via WhatsApp" button as fallback (secondary CTA)
+- [ ] Show payment status badge on order review/success page
+- [ ] Store order to server BEFORE redirecting to Midtrans (already done, but verify)
+
+### 9.5 Admin Panel Update
+- [ ] Show `payment_status` badge in order list table and cards
+- [ ] Show `payment_status` in order detail modal
+- [ ] Filter orders by payment status
+- [ ] Show payment method used (from Midtrans notification)
+
+### 9.6 Configuration & Environment
+- [ ] Add Midtrans env vars to `.env.example`: `MIDTRANS_SERVER_KEY`, `MIDTRANS_CLIENT_KEY`, `MIDTRANS_IS_PRODUCTION`
+- [ ] Add Midtrans sandbox credentials to README (how to get keys)
+- [ ] Handle sandbox vs production environment
+
+### 9.7 Testing
+- [ ] Test QRIS payment flow (scan QR code)
+- [ ] Test GoPay/ShopeePay payment flow
+- [ ] Test bank transfer (VA) payment flow
+- [ ] Test payment failure/expiry handling
+- [ ] Test webhook notification handling
+- [ ] Test WhatsApp fallback flow
+- [ ] Verify order status updates correctly after payment
+
+### Files to Create
+- `server/config/midtrans.js`
+- `server/routes/payment.js`
+- `src/payment-success.html`
+- `src/js/payment-success.js`
+- `src/css/pages/payment-success.css`
+
+### Files to Modify
+- `server/db/schema.js` — add payment_status, snap_token columns
+- `server/routes/orders.js` — return payment_status in responses
+- `src/js/order.js` — modify review step with "Bayar Sekarang" + "Kirim via WA"
+- `src/js/components/order-list.js` — add payment status badge
+- `src/js/components/order-detail.js` — add payment info section
+- `src/js/services/api.js` — add payment API calls
+- `.env.example` — add Midtrans env vars
+
+---
+
 ## Estimasi Timeline
 
 | Phase | Status | Estimasi |
@@ -300,14 +375,15 @@
 | Phase 6: Logic | ✅ Done | ~1.5-2.5 jam |
 | Phase 7: Polish | ⏳ Pending | ~1-2 jam |
 | Phase 8: Content | ⏳ Pending | ~1 jam |
-| **Total** | | **~14-20 jam kerja** |
+| Phase 9: Payment Gateway | ⏳ Pending | ~4-6 jam |
+| **Total** | | **~18-26 jam kerja** |
 
 ---
 
 ## Catatan Prioritas
 
-1. **P0 (Must Have):** Backend API + Landing page + Order flow + WA redirect + Order storage + Location sharing + Enhanced status flow
-2. **P1 (Should Have):** Admin order list + Responsive design + Validasi form + Photo upload ke server + Map di admin + Status dropdown + Image compression
+1. **P0 (Must Have):** Backend API + Landing page + Order flow + WA redirect + Order storage + Location sharing + Enhanced status flow + **Payment Gateway (Midtrans)**
+2. **P1 (Should Have):** Admin order list + Responsive design + Validasi form + Photo upload ke server + Map di admin + Status dropdown + Image compression + **Payment status tracking**
 3. **P2 (Nice to Have):** Scroll animations, glassmorphism effects, loading states, status update
 
 ---
@@ -316,7 +392,8 @@
 
 1. **Phase 7: Polish** — Animations, loading states, accessibility, SEO, Lighthouse audit
 2. **Phase 8: Content & Assets** — Logo, illustrations, OG image, favicon, web manifest
-3. **Production deployment** — Build & deploy to Railway/Render/VPS
+3. **Phase 9: Payment Gateway** — Midtrans Snap integration (QRIS, e-wallet, bank transfer)
+4. **Production deployment** — Build & deploy to Railway/Render/VPS
 
 ---
 

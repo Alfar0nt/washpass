@@ -53,4 +53,5 @@ pnpm run start
 
 1. **Phase 7**: Polish (animations, accessibility, SEO, Lighthouse audit)
 2. **Phase 8**: Assets (logo, illustrations, OG image, favicon, web manifest)
-3. **Production deployment** — Build & deploy to Railway/Render/VPS
+3. **Phase 9**: Payment Gateway — Midtrans Snap (QRIS, e-wallet, bank transfer)
+4. **Production deployment** — Build & deploy to Railway/Render/VPS
