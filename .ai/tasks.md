@@ -320,6 +320,24 @@
 
 ---
 
+## v0.0.21 Updates (2026-08-27)
+
+**Admin Panel:**
+- Images now open in modal popup instead of new tab
+- Fullscreen toggle, prev/next navigation, keyboard support (Arrows, Escape)
+- Click outside modal to close
+- Files: `src/js/components/order-detail.js`, `src/css/components/admin-detail.css`
+
+**Order Flow:**
+- Direct cart access from any step (category, material, wash type)
+- Free navigation between completed steps with data persistence (sessionStorage)
+- Step validation before proceeding to next step
+- Clickable step indicator for jumping to completed steps
+- Container spacing fixed for better mobile/desktop layout
+- Files: `src/js/order.js`, `src/js/components/step-manager.js`
+
+---
+
 ## Known Issues / Bugs ⚠️
 
 ### Issue #1: Step Navigation Stuck After Customer Form
@@ -376,6 +394,99 @@
 ---
 
 ### Issue #3: GPS Location Sharing Not Working Over HTTP ⚠️ **DOCUMENTED & IMPROVED**
+
+**Severity:** Low (Browser Security Restriction)  
+**Location:** `src/js/utils/location.js`, `src/js/components/location-picker.js`
+
+**Description:** Modern browsers require HTTPS (or localhost) for Geolocation API. HTTP connections will fail.
+
+**Fix Applied (v0.0.9):** Added HTTPS check, user-friendly error message, localhost detection for dev.
+
+---
+
+### Bug #4: Visual Selection Indicator — Selected Options Not Showing When Going Back ❌ **IN PROGRESS**
+
+**Severity:** Medium  
+**Status:** IN PROGRESS (v0.0.21)
+
+**Symptoms:**
+- User completes a step (e.g., selects "Sepatu" in Pilih Kategori)
+- Navigates forward to next steps
+- When clicking back, the previously selected option shows NO visual indicator
+- No checkmark, no highlighting — user must remember their selection
+
+**Current Behavior:**
+- Selection data persists in `sessionStorage['washpass_temp_item']`
+- But the UI doesn't show which option was previously selected
+
+**Desired Behavior:**
+- All completed steps should show checkmarks (✓) on their completed options
+- Checkmarks should persist when navigating away and back
+
+**Fix Attempted:**
+- Added `.step-indicator__step--valid` class and CSS checkmark on step indicator circles
+- Added `.category-card__checkmark`, `.material-card__checkmark`, `.wash-type-card__checkmark`
+- Updated render functions to read from sessionStorage and show checkmarks
+
+**Remaining Issues:**
+- Checkmark appearing briefly on "Konfirmasi" section when navigating back (see Bug #5)
+- Checkmark not persisting correctly on all steps
+
+**Files Affected:**
+- `src/js/order.js` — step render functions
+- `src/css/components/category-card.css` — `.category-card__checkmark`
+- `src/css/components/material-card.css` — `.material-card__checkmark`
+- `src/css/components/wash-type-card.css` — `.wash-type-card__checkmark`
+- `src/css/components/step-indicator.css` — `.step-indicator__step--valid`
+- `src/js/components/step-manager.js` — validation class management
+
+---
+
+### Bug #5: Green Checkmark Appearing Briefly Below "Konfirmasi" ❌ **IN PROGRESS**
+
+**Severity:** Low  
+**Status:** IN PROGRESS (v0.0.21)
+
+**Symptoms:**
+- When navigating back from "Konfirmasi" to "Data Diri"
+- A green checkmark briefly appears below the "Konfirmasi" step in the indicator
+- Disappears after a moment but the flash is distracting
+
+**Root Cause:**
+- CSS selector `.step-indicator__step--valid` applies checkmark styles globally
+- Race condition between `setStepValidation()` and `updateDisplay()` during navigation
+
+**Fix Attempted:**
+- Updated selector to require BOTH classes: `.step-indicator__step--completed.step-indicator__step--valid`
+- Added `transition: none` to prevent animations
+- Modified `updateDisplay()` to not remove/add validation classes during navigation
+
+**Remaining Issue:** Checkmark still flashes briefly when navigating back
+
+**Files Affected:**
+- `src/css/components/step-indicator.css`
+- `src/js/components/step-manager.js` — `updateDisplay()` and `setStepValidation()`
+
+---
+
+## Estimated Fix Timeline
+
+| Issue | Priority | Estimasi |
+|-------|----------|----------|
+| #4: Visual Selection Indicator | P1 (Medium) | 1-2 jam |
+| #5: Green Checkmark Flash | P2 (Low) | 30 menit |
+
+---
+
+## Immediate Action Items (v0.0.21) - 🚧 **IN PROGRESS**
+
+- [x] Add direct cart button from category/material/washType steps
+- [x] Make top step navigation clickable
+- [x] Add validation before proceeding to next step
+- [ ] Fix visual selection indicator showing checkmarks on completed steps
+- [ ] Fix green checkmark appearing briefly when navigating back
+- [ ] Test direct navigation to cart from any step
+- [ ] Test navigation back and forth between completed steps
 
 **Severity:** Low (Browser Security Restriction)  
 **Location:** `src/js/utils/location.js` lines 9-57 (`getCurrentPosition`), `src/js/components/location-picker.js` lines 85-121 (`getLocation`)

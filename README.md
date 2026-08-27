@@ -8,7 +8,7 @@ Website jasa cuci sepatu & sandal profesional dengan sistem pickup & delivery.
 
 See [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) for version history and changelog.
 
-See [`.ai/docs/IMPLEMENTED-FEATURES.md`](./.ai/docs/IMPLEMENTED-FEATURES.md) for detailed feature documentation and known issues.
+See [`.ai/tasks.md`](./.ai/tasks.md) for detailed feature documentation, known issues, and action items.
 
 ## Development
 
