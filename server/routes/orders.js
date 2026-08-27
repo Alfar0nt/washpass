@@ -82,7 +82,9 @@ router.post('/', uploadMiddleware, async (req, res) => {
 
       const itemId = itemResult.lastID;
 
-      const photoCount = item.photos?.length || 0;
+      const photoCount = Array.isArray(item.photos)
+        ? item.photos.length
+        : (typeof item.photos === 'number' && item.photos > 0 ? item.photos : 0);
       for (let i = 0; i < photoCount; i++) {
         if (fileIndex < files.length) {
           const file = files[fileIndex];
@@ -98,7 +100,7 @@ router.post('/', uploadMiddleware, async (req, res) => {
     res.json({ orderId, status: 'success' });
   } catch (error) {
     console.error('Error creating order:', error);
-    res.status(500).json({ error: 'Failed to create order' });
+    res.status(500).json({ error: error.message || 'Failed to create order' });
   }
 });
 

@@ -115,7 +115,13 @@ export class LocationPicker {
       this.tryReverseGeocode();
     } catch (error) {
       this.setLoading(false);
-      this.showError(error.message || 'Gagal mengambil lokasi');
+      
+      if (error.code === LOCATION_ERRORS.HTTPS_REQUIRED) {
+        this.showError('Akses lokasi memerlukan HTTPS. Untuk development, gunakan localhost atau HTTPS.');
+      } else {
+        this.showError(error.message || 'Gagal mengambil lokasi');
+      }
+      
       this.onError(error);
     }
   }

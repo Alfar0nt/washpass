@@ -18,9 +18,13 @@
 .how-it-works__steps::before {
   content: '';
   position: absolute;
-  top: 40px;
-  left: 10%;
-  right: 10%;
+  /* Align the line with the vertical center of the 100px circles.
+     Circle top is at --space-6 (step padding), center is + 50px. */
+  top: calc(var(--space-6) + 50px);
+  /* Span exactly from the first circle's center to the last circle's center.
+     With 3 equal columns, each circle center is at 100% / 6 from the edges. */
+  left: calc(100% / 6);
+  right: calc(100% / 6);
   height: 3px;
   background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
   border-radius: var(--radius-full);

@@ -76,10 +76,11 @@ export class OrderReview {
             <span>Ubah Data Diri</span>
           </button>
           <button type="button" class="btn btn-primary btn-lg btn-full" id="submitBtn">
-            <span>Kirim Pesanan via WhatsApp</span>
             <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
+            <span>Konfirmasi Order</span>
           </button>
         </div>
       </div>
@@ -212,9 +213,9 @@ export class OrderReview {
     this.backToCustomerBtn.disabled = submitting;
     
     if (submitting) {
-      this.submitBtn.innerHTML = '<span class="loading-spinner"></span><span>Mengirim pesanan...</span>';
+      this.submitBtn.innerHTML = '<span class="loading-spinner"></span><span>Mengonfirmasi order...</span>';
     } else {
-      this.submitBtn.innerHTML = '<span>Kirim Pesanan via WhatsApp</span><svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" /></svg>';
+      this.submitBtn.innerHTML = '<svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg><span>Konfirmasi Order</span>';
     }
   }
 

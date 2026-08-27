@@ -3,28 +3,51 @@
   flex-direction: column;
   gap: var(--space-4);
   margin-bottom: var(--space-8);
-}
-
-.step-indicator__progress {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  height: 4px;
-  background: var(--color-primary);
-  border-radius: var(--radius-full);
-  transform: translateY(-50%);
-  z-index: 1;
-  transition: width var(--transition-base);
+  position: relative;
 }
 
 .step-indicator__steps {
   display: flex;
   justify-content: space-between;
   position: relative;
-  z-index: 2;
   padding: 0 var(--space-2);
   margin: 0;
   list-style: none;
+}
+
+/* Background track line spanning first-to-last icon centers */
+.step-indicator__track {
+  position: absolute;
+  /* Icon centers: first icon center is at 100% / (2 * step-count),
+     last icon center is at 100% - that amount. */
+  top: 0;
+  left: calc(100% / var(--step-count, 7) / 2);
+  right: calc(100% / var(--step-count, 7) / 2);
+  height: 40px;
+  display: flex;
+  align-items: center;
+  z-index: 0;
+}
+
+.step-indicator__track::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+/* Progress fill on top of the track */
+.step-indicator__progress {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-base);
 }
 
 .step-indicator__step {
@@ -36,6 +59,7 @@
   cursor: pointer;
   transition: all var(--transition-fast);
   position: relative;
+  z-index: 2;
 }
 
 .step-indicator__step:focus-visible {
@@ -143,6 +167,10 @@
 
   .step-indicator__icon {
     width: 36px;
+    height: 36px;
+  }
+
+  .step-indicator__track {
     height: 36px;
   }
 

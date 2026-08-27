@@ -1,4 +1,5 @@
 const API_BASE = '/api';
+const REQUEST_TIMEOUT_MS = 15000;
 
 async function request(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
@@ -14,6 +15,10 @@ async function request(endpoint, options = {}) {
     config.body = JSON.stringify(config.body);
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  config.signal = controller.signal;
+
   try {
     const response = await fetch(url, config);
     const data = await response.json();
@@ -24,8 +29,14 @@ async function request(endpoint, options = {}) {
 
     return data;
   } catch (error) {
+    if (error.name === 'AbortError') {
+      console.error(`API Timeout (${endpoint}): request timed out after ${REQUEST_TIMEOUT_MS}ms`);
+      throw new Error('Permintaan ke server melebihi batas waktu. Silakan coba lagi.');
+    }
     console.error(`API Error (${endpoint}):`, error);
     throw error;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 

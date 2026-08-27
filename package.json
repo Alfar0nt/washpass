@@ -1,6 +1,6 @@
 {
   "name": "washpass",
-  "version": "v0.0.6",
+  "version": "v0.0.20",
   "description": "Website jasa pencucian sepatu dan sandal dengan sistem pick-up → cuci → antar kembali",
   "type": "module",
   "scripts": {
@@ -8,7 +8,8 @@
     "dev:server": "node server/index.js",
     "dev:all": "concurrently \"pnpm run dev\" \"pnpm run dev:server\"",
     "build": "vite build",
-    "start": "NODE_ENV=production node server/index.js"
+    "start": "NODE_ENV=production node server/index.js",
+    "clean:ports": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true; lsof -ti:5173 | xargs kill -9 2>/dev/null || true; echo 'Ports cleared'"
   },
   "dependencies": {
     "cors": "^2.8.5",

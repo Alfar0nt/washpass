@@ -18,7 +18,7 @@ export class OrderDetail {
 
   render() {
     this.container.innerHTML = `
-      <div class="admin-modal-overlay" id="modalOverlay">
+      <div class="admin-modal-overlay" id="modalOverlay" style="display: none">
         <div class="admin-modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
           <div class="admin-modal__header">
             <h2 id="modalTitle">Detail Pesanan</h2>
@@ -62,25 +62,42 @@ export class OrderDetail {
     this.orderId = orderId;
     this.overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    
+    this.showLoading();
+
     try {
       this.order = await getOrderDetail(orderId);
       this.renderDetail();
     } catch (error) {
       console.error('Failed to load order detail:', error);
-      this.content.innerHTML = `
-        <div class="admin-error">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          <h3>Gagal Memuat</h3>
-          <p>${error.message}</p>
-          <button type="button" class="btn btn-primary" onclick="this.closest('.admin-modal-overlay').querySelector('.admin-modal__close').click()">Tutup</button>
-        </div>
-      `;
+      this.showError(error.message || 'Gagal memuat detail pesanan');
     }
+  }
+
+  showLoading() {
+    this.content.innerHTML = `
+      <div class="admin-loading">
+        <div class="loading-spinner"></div>
+        <p>Memuat detail...</p>
+      </div>
+    `;
+  }
+
+  showError(message) {
+    this.content.innerHTML = `
+      <div class="admin-error">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <h3>Gagal Memuat</h3>
+        <p>${this.escapeHtml(message)}</p>
+        <button type="button" class="btn btn-primary" id="errorCloseBtn">Tutup</button>
+      </div>
+    `;
+
+    const closeBtn = this.content.querySelector('#errorCloseBtn');
+    if (closeBtn) closeBtn.addEventListener('click', () => this.close());
   }
 
   close() {

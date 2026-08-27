@@ -9,7 +9,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const DEFAULT_PORT = 3000;
+const PORT = process.env.PORT || DEFAULT_PORT;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Initialize database
@@ -38,8 +39,32 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-const server = app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT} (${NODE_ENV})`);
+function startServer(port) {
+  return new Promise((resolve, reject) => {
+    const server = app.listen(port, () => {
+      console.log(`Server running on http://localhost:${port} (${NODE_ENV})`);
+      resolve(server);
+    }).on('error', (error) => {
+      if (error.code === 'EADDRINUSE') {
+        console.warn(`Port ${port} is in use, trying port ${port + 1}...`);
+        // Try next port automatically
+        setTimeout(() => {
+          startServer(port + 1).then(resolve).catch(reject);
+        }, 500);
+      } else {
+        console.error('Server error:', error);
+        reject(error);
+      }
+    });
+  });
+}
+
+// Start server with automatic port retry
+startServer(PORT).then(() => {
+  // Server started successfully
+}).catch((error) => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
 });
 
 function gracefulShutdown() {

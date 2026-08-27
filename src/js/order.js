@@ -3,7 +3,7 @@ import { initCustomerForm } from './components/customer-form.js';
 import { initOrderReview } from './components/order-review.js';
 import { cart } from './components/cart.js';
 import { submitOrder } from './services/api.js';
-import { generateWhatsAppMessage, redirectToWhatsApp } from './utils/whatsapp.js';
+import { generateWhatsAppMessage, redirectToWhatsApp, isWhatsAppMock } from './utils/whatsapp.js';
 import { formatCurrency } from './utils/formatters.js';
 import { compressImage, validateImageFile } from './utils/image-compressor.js';
 
@@ -25,9 +25,12 @@ const stepComponents = {
 };
 
 const app = document.getElementById('app');
+const backToHomeContainer = document.createElement('div');
+backToHomeContainer.id = 'backToHomeBar';
+app.prepend(backToHomeContainer);
 const stepIndicatorContainer = document.createElement('div');
 stepIndicatorContainer.id = 'stepIndicator';
-app.prepend(stepIndicatorContainer);
+backToHomeContainer.after(stepIndicatorContainer);
 
 function init() {
   const contentContainer = document.createElement('main');
@@ -35,6 +38,7 @@ function init() {
   contentContainer.setAttribute('role', 'main');
   app.appendChild(contentContainer);
 
+  renderBackToHomeBar();
   stepManager = initStepManager(stepIndicatorContainer, {
     onStepChange: handleStepChange,
     onStepComplete: handleStepComplete,
@@ -42,6 +46,31 @@ function init() {
 
   loadCartFromStorage();
   renderStep('category');
+}
+
+function renderBackToHomeBar() {
+  backToHomeContainer.innerHTML = `
+    <header class="order-header">
+      <a href="/" class="order-header__back" aria-label="Kembali ke beranda">
+        <svg class="order-header__back-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12" />
+          <polyline points="12 19 5 12 12 5" />
+        </svg>
+        <span>Kembali ke Beranda</span>
+      </a>
+      <a href="/" class="order-header__logo" aria-label="WashPass beranda">
+        <span class="order-header__logo-mark">👟</span>
+        <span class="order-header__logo-text">WashPass</span>
+      </a>
+    </header>
+  `;
+
+  const header = backToHomeContainer.querySelector('.order-header');
+  const setHeaderHeight = () => {
+    document.documentElement.style.setProperty('--order-header-height', `${header.offsetHeight}px`);
+  };
+  setHeaderHeight();
+  window.addEventListener('resize', setHeaderHeight);
 }
 
 function loadCartFromStorage() {
@@ -57,6 +86,7 @@ function loadCartFromStorage() {
 }
 
 function handleStepChange(step, index) {
+  console.log('Step changed to:', step.id, 'Index:', index);
   renderStep(step.id);
 }
 
@@ -123,10 +153,18 @@ function renderCategoryStep(container) {
 }
 
 function selectCategory(category) {
-  cart.clear();
-  const nextStep = category === 'shoe' ? 'material' : 'washType';
+  const tempItem = JSON.parse(sessionStorage.getItem('washpass_temp_item') || '{}');
+  tempItem.category = category;
+  if (category !== 'sandal') {
+    delete tempItem.material;
+  }
+  sessionStorage.setItem('washpass_temp_item', JSON.stringify(tempItem));
+
   stepManager.completeCurrentStep();
-  stepManager.goToStep(STEP_ORDER.indexOf(nextStep));
+  // Sandal has no material step — skip straight to wash type selection
+  if (category === 'sandal') {
+    stepManager.goToStep(STEP_ORDER.indexOf('washType'));
+  }
 }
 
 function renderMaterialStep(container) {
@@ -144,12 +182,22 @@ function renderMaterialStep(container) {
             </button>
           `).join('')}
         </div>
+        <div class="step-actions">
+          <button type="button" class="btn btn-outline" id="backToCategory">
+            <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            <span>Kembali</span>
+          </button>
+        </div>
       </div>
     `;
 
     container.querySelectorAll('.material-card').forEach(card => {
       card.addEventListener('click', () => selectMaterial(card.dataset.material));
     });
+    container.querySelector('#backToCategory')?.addEventListener('click', () => stepManager.previous());
   });
 }
 
@@ -157,7 +205,6 @@ function selectMaterial(material) {
   const tempItem = { category: 'shoe', material };
   sessionStorage.setItem('washpass_temp_item', JSON.stringify(tempItem));
   stepManager.completeCurrentStep();
-  stepManager.next();
 }
 
 function renderWashTypeStep(container) {
@@ -186,12 +233,22 @@ function renderWashTypeStep(container) {
             `;
           }).join('')}
         </div>
+        <div class="step-actions">
+          <button type="button" class="btn btn-outline" id="backToPrevious">
+            <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            <span>Kembali</span>
+          </button>
+        </div>
       </div>
     `;
 
     container.querySelectorAll('.wash-type-card').forEach(card => {
       card.addEventListener('click', () => selectWashType(card.dataset.washType));
     });
+    container.querySelector('#backToPrevious')?.addEventListener('click', () => stepManager.previous());
   });
 }
 
@@ -205,7 +262,6 @@ function selectWashType(washType) {
     : PRICING.shoe[tempItem.material]?.[washType] || 0;
   sessionStorage.setItem('washpass_temp_item', JSON.stringify(tempItem));
   stepManager.completeCurrentStep();
-  stepManager.next();
 }
 
 function renderPhotosStep(container) {
@@ -226,16 +282,29 @@ function renderPhotosStep(container) {
     </div>
   `;
 
-  initPhotoUploader();
+  // Ensure DOM elements exist before initializing
+  const photoUploader = container.querySelector('#photoUploader');
+  if (!photoUploader) {
+    console.error('Photo uploader container not found');
+    return;
+  }
+
+  initPhotoUploader(container);
   container.querySelector('#backToWashType').addEventListener('click', () => stepManager.previous());
   container.querySelector('#addToCart').addEventListener('click', addToCart);
 }
 
 let currentPhotos = [];
 
-function initPhotoUploader() {
-  const uploader = document.getElementById('photoUploader');
-  const preview = document.getElementById('photoPreview');
+function initPhotoUploader(container) {
+  const uploader = container.querySelector('#photoUploader');
+  const preview = container.querySelector('#photoPreview');
+  
+  if (!uploader || !preview) {
+    console.error('Photo uploader or preview container not found');
+    return;
+  }
+  
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
@@ -385,7 +454,6 @@ function addToCart() {
   currentPhotos = [];
   sessionStorage.removeItem('washpass_temp_item');
   stepManager.completeCurrentStep();
-  stepManager.next();
 }
 
 function renderCartStep(container) {
@@ -461,7 +529,6 @@ function renderCartStep(container) {
   });
   container.querySelector('#proceedToCustomer')?.addEventListener('click', () => {
     stepManager.completeCurrentStep();
-    stepManager.next();
   });
 
   container.querySelectorAll('.cart-item__remove').forEach(btn => {
@@ -511,6 +578,8 @@ function getMaterialLabel(material) {
 }
 
 function renderCustomerStep(container) {
+  const savedOrder = JSON.parse(sessionStorage.getItem('washpass_order_data') || '{}');
+
   container.innerHTML = `
     <div class="step-content">
       <h2 class="step-title">Data Customer</h2>
@@ -520,14 +589,29 @@ function renderCustomerStep(container) {
   `;
 
   customerForm = initCustomerForm(container.querySelector('#customerFormContainer'), {
+    initialData: savedOrder.customer || {},
     onSubmit: handleCustomerSubmit,
     onBack: () => stepManager.previous(),
   });
 }
 
 function handleCustomerSubmit(formData) {
+  const allItems = cart.getItems();
+  
+  console.log('Cart items:', allItems);
+  console.log('Customer form data:', formData);
+  
   const orderData = {
-    items: cart.getItems(),
+    items: allItems.map(item => ({
+      id: item.id,
+      category: item.category,
+      material: item.material,
+      wash_type: item.wash_type,
+      price: item.price,
+      notes: item.notes,
+      quantity: item.quantity || 1,
+      photoCount: (item.photos || []).length,
+    })),
     customer: formData,
     totalPrice: cart.getTotalPrice(),
     totalItems: cart.getTotalItems(),
@@ -535,15 +619,28 @@ function handleCustomerSubmit(formData) {
     longitude: formData.longitude,
   };
 
-  sessionStorage.setItem('washpass_order_data', JSON.stringify(orderData));
+  console.log('Order data to save:', orderData);
+  
+  try {
+    sessionStorage.setItem('washpass_order_data', JSON.stringify(orderData));
+    const saved = sessionStorage.getItem('washpass_order_data');
+    console.log('SessionStorage saved:', saved ? '✓' : '✗');
+  } catch (e) {
+    console.error('Failed to save order data:', e);
+  }
+  
+  console.log('Current step before complete:', stepManager.getCurrentStepIndex());
   stepManager.completeCurrentStep();
-  stepManager.next();
+  console.log('Current step after complete:', stepManager.getCurrentStepIndex());
 }
 
 function renderReviewStep(container) {
   const orderData = JSON.parse(sessionStorage.getItem('washpass_order_data') || '{}');
   
+  console.log('Rendering review step, orderData:', orderData);
+  
   if (!orderData.items || orderData.items.length === 0) {
+    console.warn('No items in orderData, redirecting to cart');
     stepManager.goToStep(STEP_ORDER.indexOf('cart'));
     return;
   }
@@ -556,44 +653,125 @@ function renderReviewStep(container) {
   });
 }
 
+function buildOrderFormData(orderData) {
+  const formData = new FormData();
+  formData.append('customer_name', orderData.customer.name);
+  formData.append('whatsapp', orderData.customer.whatsapp);
+  formData.append('address', orderData.customer.address);
+  formData.append('address_note', orderData.customer.address_note || '');
+  if (orderData.latitude) formData.append('latitude', orderData.latitude.toString());
+  if (orderData.longitude) formData.append('longitude', orderData.longitude.toString());
+
+  // Use the live cart as the source of truth so photo File objects survive
+  const liveItems = cart.getItems();
+  const itemsForServer = liveItems.map(item => ({
+    category: item.category,
+    material: item.material || null,
+    wash_type: item.wash_type,
+    price: item.price,
+    notes: item.notes || null,
+    photos: (item.photos || []).length,
+  }));
+
+  formData.append('items', JSON.stringify(itemsForServer));
+  formData.append('total_price', orderData.totalPrice.toString());
+  formData.append('total_items', orderData.totalItems.toString());
+
+  liveItems.forEach(item => {
+    (item.photos || []).forEach(photo => {
+      formData.append('photos', photo);
+    });
+  });
+
+  return formData;
+}
+
 async function handleOrderSubmit() {
   const orderData = JSON.parse(sessionStorage.getItem('washpass_order_data') || '{}');
   orderReview.setSubmitting(true);
 
   try {
-    const formData = new FormData();
-    formData.append('customer_name', orderData.customer.name);
-    formData.append('whatsapp', orderData.customer.whatsapp);
-    formData.append('address', orderData.customer.address);
-    formData.append('address_note', orderData.customer.address_note || '');
-    if (orderData.latitude) formData.append('latitude', orderData.latitude.toString());
-    if (orderData.longitude) formData.append('longitude', orderData.longitude.toString());
-    formData.append('items', JSON.stringify(orderData.items));
-    formData.append('total_price', orderData.totalPrice.toString());
-    formData.append('total_items', orderData.totalItems.toString());
+    // 1. Confirm the order on the server side FIRST
+    const response = await submitOrder(buildOrderFormData(orderData));
 
-    orderData.items.forEach((item, itemIndex) => {
-      item.photos?.forEach((photo, photoIndex) => {
-        formData.append('photos', photo);
-      });
-    });
-
-    const response = await submitOrder(formData);
-    
-    if (response.orderId) {
-      const waMessage = generateWhatsAppMessage(orderData);
-      sessionStorage.removeItem('washpass_order_data');
-      sessionStorage.removeItem('washpass_cart');
-      cart.clear();
-      redirectToWhatsApp(waMessage);
-    } else {
+    if (!response.orderId) {
       throw new Error('Gagal membuat order');
     }
+
+    const orderId = response.orderId;
+
+    // 2. Clear the draft once confirmed
+    sessionStorage.removeItem('washpass_order_data');
+    sessionStorage.removeItem('washpass_cart');
+
+    // 3. Show on-page confirmation (WhatsApp sending is handled on the success screen)
+    renderSuccessStep(orderId, orderData);
   } catch (error) {
     console.error('Order submit error:', error);
-    alert('Gagal mengirim pesanan: ' + error.message);
+    alert('Gagal mengonfirmasi order: ' + error.message);
     orderReview.setSubmitting(false);
   }
+}
+
+function renderSuccessStep(orderId, orderData) {
+  if (currentStepComponent && currentStepComponent.destroy) {
+    currentStepComponent.destroy();
+  }
+  currentStepComponent = null;
+
+  if (stepIndicatorContainer) {
+    stepIndicatorContainer.style.display = 'none';
+  }
+
+  const contentContainer = document.getElementById('stepContent');
+  const waMessage = generateWhatsAppMessage(orderData);
+  const mockMode = isWhatsAppMock();
+
+  contentContainer.innerHTML = `
+    <div class="step-content order-success">
+      <div class="order-success__icon">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+      </div>
+      <h2 class="step-title">Order Terkonfirmasi</h2>
+      <p class="step-subtitle">Terima kasih! Pesanan Anda telah tercatat di sistem.</p>
+
+      <div class="order-success__card">
+        <div class="order-success__row">
+          <span>Nomor Pesanan</span>
+          <strong class="order-success__code">#${orderId}</strong>
+        </div>
+        <div class="order-success__row">
+          <span>Status</span>
+          <strong>Pending</strong>
+        </div>
+      </div>
+
+      <p class="order-success__note">Pesanan Anda sudah tersimpan di dashboard admin WashPass untuk diproses.</p>
+
+      ${mockMode ? `
+        <div class="order-success__mock">
+          <span class="order-success__mock-badge">Mode Mock</span>
+          <span>WhatsApp masih dalam mode simulasi (mock). Pesanan sudah dikonfirmasi di server.</span>
+        </div>
+      ` : ''}
+
+      <div class="order-success__actions">
+        <button type="button" class="btn btn-primary btn-lg btn-full" id="waSendBtn">
+          <span>${mockMode ? 'Kirim Ringkasan via WhatsApp (Mock)' : 'Kirim Ringkasan via WhatsApp'}</span>
+        </button>
+        <a href="/" class="btn btn-outline btn-lg btn-full">
+          <span>Kembali ke Beranda</span>
+        </a>
+      </div>
+    </div>
+  `;
+
+  contentContainer.querySelector('#waSendBtn').addEventListener('click', () => {
+    redirectToWhatsApp(waMessage);
+  });
 }
 
 if (document.readyState === 'loading') {

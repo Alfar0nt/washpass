@@ -25,9 +25,11 @@ export class StepManager {
 
   render() {
     this.container.innerHTML = `
-      <div class="step-indicator" role="navigation" aria-label="Progress steps">
-        <div class="step-indicator__progress" id="stepProgress"></div>
+      <div class="step-indicator" role="navigation" aria-label="Progress steps" style="--step-count: ${this.steps.length}">
         <ol class="step-indicator__steps" id="stepList">
+          <div class="step-indicator__track" aria-hidden="true">
+            <div class="step-indicator__progress" id="stepProgress"></div>
+          </div>
           ${this.steps.map((step, index) => this.renderStep(step, index)).join('')}
         </ol>
       </div>
@@ -73,6 +75,9 @@ export class StepManager {
   updateDisplay() {
     if (!this.progressBar || !this.stepList) return;
 
+    // The progress fill lives inside the track, which already spans from the
+    // first icon's center to the last icon's center. So its width percentage is
+    // relative to the track, reaching exactly the active step's icon center.
     const progress = (this.currentStepIndex / (this.steps.length - 1)) * 100;
     this.progressBar.style.width = `${progress}%`;
 

@@ -3,11 +3,22 @@ export const LOCATION_ERRORS = {
   POSITION_UNAVAILABLE: 'position_unavailable',
   TIMEOUT: 'timeout',
   NOT_SUPPORTED: 'not_supported',
+  HTTPS_REQUIRED: 'https_required',
   UNKNOWN: 'unknown',
 };
 
 export function getCurrentPosition(options = {}) {
   return new Promise((resolve, reject) => {
+    // Check for HTTPS requirement (except localhost for development)
+    const isSecure = window.isSecureContext || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isSecure) {
+      reject({ 
+        code: LOCATION_ERRORS.HTTPS_REQUIRED, 
+        message: 'Location access requires HTTPS. Please use https:// or access via localhost for development.' 
+      });
+      return;
+    }
+    
     if (!navigator.geolocation) {
       reject({ code: LOCATION_ERRORS.NOT_SUPPORTED, message: 'Geolocation is not supported by this browser' });
       return;

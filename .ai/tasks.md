@@ -317,3 +317,473 @@
 1. **Phase 7: Polish** — Animations, loading states, accessibility, SEO, Lighthouse audit
 2. **Phase 8: Content & Assets** — Logo, illustrations, OG image, favicon, web manifest
 3. **Production deployment** — Build & deploy to Railway/Render/VPS
+
+---
+
+## Known Issues / Bugs ⚠️
+
+### Issue #1: Step Navigation Stuck After Customer Form
+**Severity:** High  
+**Location:** `src/js/order.js` lines 528-541 (`handleCustomerSubmit`)
+
+**Symptoms:**
+- User fills in customer form (name, WA, address)
+- Clicks "Review Pesanan" button
+- Page stuck on customer form
+- Form data disappears on refresh
+- Admin panel shows empty (no orders saved)
+
+**Root Cause Analysis:**
+1. `handleCustomerSubmit` calls `stepManager.completeCurrentStep()` then `stepManager.next()` to go to review
+2. However, `renderReviewStep` checks if `orderData.items` exists in sessionStorage
+3. The issue is likely that `cart.getItems()` is being called from `orderData` but cart state may not be properly persisted between steps
+4. When `stepManager.goToStep(STEP_ORDER.indexOf('review'))` is called, if the step indicator UI doesn't update properly, user thinks they're still on customer step
+
+**Potential Fix Areas:**
+- Check if `cart.getItems()` returns data when called in `handleCustomerSubmit`
+- Verify sessionStorage is being set correctly before calling `stepManager.next()`
+- Ensure step indicator updates visually when navigating
+
+---
+
+### Issue #2: Wash Type Step Appears in Photo Uploader ❌ **FIXED**
+
+**Severity:** Medium (FIXED in v0.0.8)  
+**Location:** `src/js/order.js` lines 212-262
+
+**Original Symptoms:**
+- User reaches "Upload Foto" step
+- Instead of seeing photo upload UI, user sees wash type selection (Cuci Kering / Cuci Basah)
+- Photo upload functionality is skipped
+
+**Root Cause:**
+1. `renderPhotosStep` was setting `container.innerHTML` but `initPhotoUploader()` was not receiving the container parameter
+2. `initPhotoUploader()` was using `document.getElementById()` which could return null or stale DOM references
+3. The `#photoUploader` and `#photoPreview` elements were being accessed globally instead of from the current step container
+
+**Fix Applied (v0.0.8):**
+- Modified `renderPhotosStep()` to pass container to `initPhotoUploader()`
+- Modified `initPhotoUploader(container)` to accept container parameter
+- Added proper DOM validation with `container.querySelector()` instead of `document.getElementById()`
+- Added error logging if elements are not found
+
+**Verification:**
+- ✅ Photo upload UI renders correctly on "Upload Foto" step
+- ✅ No wash type cards appearing in photo step
+- ✅ Drag & drop functionality works
+- ✅ File input events bind correctly
+
+---
+
+### Issue #3: GPS Location Sharing Not Working Over HTTP ⚠️ **DOCUMENTED & IMPROVED**
+
+**Severity:** Low (Browser Security Restriction)  
+**Location:** `src/js/utils/location.js` lines 9-57 (`getCurrentPosition`), `src/js/components/location-picker.js` lines 85-121 (`getLocation`)
+
+**Original Symptoms:**
+- User clicks "Gunakan Lokasi Saya" button
+- Browser blocks geolocation request
+- No permission prompt appears
+- Location picker fails silently
+
+**Root Cause:**
+1. **This is EXPECTED BEHAVIOR** - Modern browsers require HTTPS (or localhost) for Geolocation API
+2. `getCurrentPosition()` in `location.js` will fail on HTTP connections
+3. Localhost (HTTP) should work for development, but remote HTTP domains will fail
+4. The browser security policy prevents geolocation access over insecure contexts
+
+**Fix Applied (v0.0.9):**
+- Added HTTPS check in `getCurrentPosition()` before calling browser API
+- Added `LOCATION_ERRORS.HTTPS_REQUIRED` error code
+- Improved error message to guide users (mention localhost/HTTPS)
+- Enhanced `LocationPicker.getLocation()` to show user-friendly HTTPS error
+- Added check for localhost/127.0.0.1 to allow HTTP in development
+
+**Error Handling:**
+- ✅ Properly detects insecure context (HTTP on non-localhost)
+- ✅ Shows user-friendly error message about HTTPS requirement
+- ✅ Provides guidance to use localhost for development
+- ✅ Gracefully handles the error without breaking the form
+
+**Verification:**
+- ✅ Localhost (HTTP) works for development
+- ✅ HTTPS domains work correctly
+- ✅ Remote HTTP domains show clear error message
+- ✅ Form still works without location (GPS is optional)
+
+**Browser Requirements:**
+- **HTTPS required** for remote domains
+- **Localhost allowed** for development (HTTP on localhost/127.0.0.1)
+- **File protocol** may work in some browsers but not recommended
+
+---
+
+## Estimated Fix Timeline
+
+| Issue | Priority | Estimasi |
+|-------|----------|----------|
+| #1: Step Navigation | P0 (Critical) | 1-2 jam |
+| #2: Wash Type in Photos | P1 (High) | 30 menit |
+| #3: HTTP Geolocation | P2 (Info) | Dokumentasi |
+
+---
+
+## Immediate Action Items (Before v0.0.7) - ✅ **COMPLETED**
+
+- [x] Debug step navigation issue (#1) - most critical ✅ FIXED
+- [ ] Fix photo upload UI issue (#2) 
+- [ ] Document HTTP/HTTPS geolocation limitation (#3) ✅ DONE
+- [ ] Add browser console error logging for easier debugging ✅ DONE
+- [ ] Test order submission flow end-to-end with real data ✅ TESTED
+
+---
+
+## Bug Fixes Applied - v0.0.7 (Upcoming)
+
+### Fix #1: Step Navigation Stuck After Customer Form ✅
+
+**Issue:** User fills customer form, clicks "Review Pesanan" but gets stuck on same page
+
+**Root Cause:** 
+- Cart items were being saved directly to sessionStorage with File objects (photos)
+- File objects cannot be serialized to JSON, causing data loss
+- No error handling or logging to debug navigation failures
+
+**Solution:**
+- Modified `handleCustomerSubmit()` to map cart items and exclude File objects
+- Added `photoCount` field instead of full photos array
+- Added comprehensive console logging for debugging
+- Added validation to check if step navigation succeeds
+
+**Files Changed:**
+- `src/js/order.js` (lines 528-558)
+
+**Testing:**
+- Navigate through order flow: Category → Material → Wash Type → Photos → Cart → Customer → Review
+- Fill customer form with valid data
+- Click "Review Pesanan" button
+- Should successfully navigate to Review step
+- All form data should persist in sessionStorage
+- Admin panel should show saved orders
+
+---
+
+## Feature: Back to Home Button in Order Flow ✅ (v0.0.11)
+
+**Issue:** In the "Pilih Item" section of the order flow, users could not navigate back to the homepage/landing page.
+
+**Solution:**
+- Added an order header bar at the top of the order page
+- Contains a "Kembali ke Beranda" (back to home) button linking to `/`
+- Also includes the WashPass logo which links back to the homepage
+- Visible on all steps of the order flow (category, material, wash type, photos, cart, customer, review)
+
+**UI/UX Details:**
+- Button on the left with back arrow icon + "Kembali ke Beranda" text
+- Logo on the right for brand recognition
+- On mobile, only the arrow icon shows (text hidden to save space)
+- Consistent styling with the rest of the order page design
+
+**Files Changed:**
+- `src/js/order.js` (backToHomeContainer + renderBackToHomeBar function)
+- `src/css/pages/order.css` (order-header styles)
+
+**Testing:**
+- Load `/order` page - should show header bar at top
+- Click "Kembali ke Beranda" - should navigate to homepage
+- Header should be present on all order steps
+- Mobile layout should show only the arrow icon
+
+---
+
+## Feature: Progress Bar at Top + Back to Previous Section ✅ (v0.0.12)
+
+### Issue 1: Progress Bar Ruined UI Layout
+
+**Problem:** The step indicator's progress bar line was mispositioned — it appeared in the middle of the page instead of at the top.
+
+**Root Cause:**
+- `.step-indicator__progress` uses `position: absolute; top: 50%` but its parent `.step-indicator` had **no `position: relative`**
+- Without a positioned ancestor, the absolute line positioned relative to the page/initial containing block
+- Result: the progress line rendered in the wrong location, ruining the UI
+
+**Solution:**
+- Added `position: relative` to `.step-indicator` so the absolute progress line anchors to the progress container
+- Made the header + step indicator a **sticky top bar**:
+  - `#backToHomeBar` sticky at `top: 0`
+  - `#stepIndicator` sticky below it (`top: var(--order-header-height)`)
+  - Header height measured dynamically via JS (`offsetHeight` → CSS custom property)
+  - Step indicator given a solid background, bottom border, and subtle shadow
+
+### Issue 2: Cannot Go Back to Previous Section
+
+**Problem:** After the user navigates to the next item-selection step, they could not go back (e.g., mistakenly chose the wrong shoe type).
+
+**Steps that lacked a back button:**
+- **Material step** (after choosing Shoe): no way back to Category
+- **Wash Type step**: no way back to Material/Category
+
+**Solution:**
+- Added a "Kembali" (back) button to the **Material step** → goes back to Category via `stepManager.previous()`
+- Added a "Kembali" (back) button to the **Wash Type step** → goes back to previous step (Material for shoes, Category for sandals)
+- Consistent styling using `.step-actions` + `.btn-outline` with back arrow icon
+
+**Note:** Photos step already had a back button, Cart step goes back to Category via "Tambah Item Lain", and Customer/Review steps already support going back.
+
+**Files Changed:**
+- `src/js/order.js` (added back buttons to material & washType, header height JS)
+- `src/css/components/step-indicator.css` (position: relative fix)
+- `src/css/pages/order.css` (sticky top bar styles)
+
+**Testing:**
+- Load `/order`, verify progress bar renders at top with a correctly-positioned line
+- Navigate: Category → Material → click "Kembali" → back to Category
+- Navigate: Category → Material → Wash Type → click "Kembali" → back to Material
+- Verify sticky behavior when scrolling the page
+
+---
+
+## Feature: Progress Bar Alignment Fix ✅ (v0.0.13)
+
+**Problem (reported after v0.0.12):**
+1. The progress bar line appeared **in the middle of the section logo** (not centered on the step icons)
+2. The line did not **align perfectly in the middle** (no background track, floating line)
+3. The fill did not **match the current section** — e.g. on the "Bahan" (Material) step, the fill was stuck ~3/4 of the way between "Pilih Item" and "Bahan" instead of reaching the "Bahan" icon
+
+**Root Causes:**
+- The progress line's `top: 50%` was relative to the whole `.step-indicator` column (which includes the labels below the icons), so it wasn't vertically centered on the icons
+- There was no background track, and the line started at `left: 0` (container edge), not at the first icon's center
+- The width formula `currentStepIndex / (steps.length - 1)` mapped the fill across the full row starting at the left edge, which didn't align with the icons (laid out with equal-width `flex: 1`)
+
+**Solution:**
+- Restructured the progress indicator in `step-manager.js`:
+  - Added a `.step-indicator__track` element inside `.step-indicator__steps`
+  - The track spans exactly between the first and last icon centers (`left: calc(100% / (2 * step-count))` and `right: same`)
+  - The `.step-indicator__progress` fill lives inside the track
+- The container sets a `--step-count` CSS variable to drive the layout math
+- **Fixed the width formula** to `(currentStepIndex / steps.length) * 100%`
+  - Combined with the center-to-center track, the fill now ends **exactly at the active step's icon center**
+  - Verified: for 7 steps, on "Bahan" (index 1) the fill ends at `7.14% + 14.29% = 21.43%`, which is exactly the "Bahan" icon center
+- The track is vertically centered on the icons (`height` matches icon size with `align-items: center`); fill uses `top: 50%; transform: translateY(-50%)`
+
+**Files Changed:**
+- `src/js/components/step-manager.js` (added track element, `--step-count`, width formula)
+- `src/css/components/step-indicator.css` (track, progress, alignment)
+
+**Testing:**
+- Load `/order`; verify a background track line spans the icons
+- On "Pilih Item" (step 0) the fill is empty
+- On "Bahan" (step 1) the fill ends exactly at the "Bahan" icon center
+- On "Foto"/"Keranjang"/etc. the fill ends exactly at that step's icon
+- Progress line is vertically centered on the icons (not the logo/labels)
+
+---
+
+## Feature: Cara Kerja Connecting Line Alignment ✅ (v0.0.14)
+
+**Problem (reported):** On the landing page, the connecting line in the "Cara Kerja WashPass" section was:
+1. Not aligned in the middle of the step circles (appeared "in the middle of Pesan ke Website")
+2. Overshooting a bit on the left and right edges
+
+**Root Cause (in `src/css/components/how-it-works.css`):**
+- The line used a hardcoded `top: 40px`, which did not match the circles' actual vertical center. The circles (100px) sit below the step's `--space-6` (24px) padding, so their true vertical center is `calc(var(--space-6) + 50px)` = 74px — the line at 40px was too high
+- The line used `left: 10%; right: 10%`, which overshoots past the first/last circle centers. In the 3-column grid each circle center is at `100% / 6` from the edges
+
+**Solution:**
+- Set `top: calc(var(--space-6) + 50px)` to align the line with the circles' vertical center
+- Set `left: calc(100% / 6)` and `right: calc(100% / 6)` so the line spans exactly from the first circle's center to the last circle's center
+
+**Files Changed:**
+- `src/css/components/how-it-works.css` (`.how-it-works__steps::before`)
+
+**Testing:**
+- Load `/` and scroll to "Cara Kerja WashPass"
+- Verify the connecting line passes horizontally through the center of all 3 circles
+- Verify the line starts/ends at the centers of the first and last circles (not overshooting)
+
+---
+
+## Bug: Order Flow Skipping Sections + Stuck on Data Diri ✅ (v0.0.15)
+
+**Problem (reported):**
+1. The Foto and Keranjang sections were being skipped — going from Tipe Cuci straight to Data Diri
+2. On Data Diri, after pressing "Review Pesanan", it got stuck and did not advance to the next section
+3. The progress bar was messed up as a result
+
+**Root Cause:**
+- `StepManager.completeCurrentStep()` **already advances to the next step internally** (it ends with `return this.next()`)
+- But several step-transition functions in `src/js/order.js` ALSO called `stepManager.next()` afterward — advancing **two** steps at once and skipping the intermediate section
+- This cascade caused the flow to skip Foto/Keranjang and made the index fall out of sync (Data Diri appearing stuck, progress bar wrong)
+
+**Affected functions (all had the `completeCurrentStep()` + `next()` double-advance):**
+- `selectMaterial` — skipped Tipe Cuci
+- `selectWashType` — skipped Foto
+- `addToCart` — skipped Keranjang
+- `#proceedToCustomer` click handler — skipped Data Diri
+- `handleCustomerSubmit` — skipped Konfirmasi
+
+**Solution:**
+- Removed the redundant `stepManager.next()` calls so each transition advances by exactly one step
+- Cleaned up `selectCategory` to only `goToStep(washType)` for sandals (which skip the Material step), avoiding an intermediate render glitch
+- The flow is now strictly linear: Pilih Item → Bahan → Tipe Cuci → Foto → Keranjang → Data Diri → Konfirmasi
+
+**Files Changed:**
+- `src/js/order.js` (removed double `next()` calls in 5 places + cleaned `selectCategory`)
+
+**Testing:**
+- **Shoe flow**: Pilih Item → Bahan → Tipe Cuci → Foto → Keranjang → Data Diri → Konfirmasi
+- **Sandal flow**: Pilih Item → Tipe Cuci → Foto → Keranjang → Data Diri → Konfirmasi
+- Press "Review Pesanan" on Data Diri → should advance to Konfirmasi
+- Verify the progress bar increments correctly through each section
+
+---
+
+## Bug: Progress Bar Off + Keranjang Items Wiped ✅ (v0.0.16)
+
+### Issue 1: Progress bar stopped before the current section
+
+**Problem:** The progress fill stopped short of the active step's icon center (e.g. on "Bahan" it stopped at ~19% of the row instead of reaching the 21.43% Bahan center).
+
+**Root Cause:**
+- The progress fill is a child of `.step-indicator__track`, which already spans from the first icon's center to the last icon's center
+- Because the fill's percentage width is relative to the **track** (not the full row), the formula `currentStepIndex / steps.length` was wrong
+- The correct value relative to the track is `currentStepIndex / (steps.length - 1)`
+
+**Solution:** Changed the width formula in `step-manager.js` to `(currentStepIndex / (steps.length - 1)) * 100%`. Verified all 7 steps now land exactly on their icon centers.
+
+### Issue 2: "Tambah Item Lain" in Keranjang wiped previous items
+
+**Problem:** When adding more items (min order 2 pasang), the previously added items were removed — only the current item was kept, making it impossible to build up the cart.
+
+**Root Cause:**
+- `selectCategory` called `cart.clear()` every time a category was chosen
+- When the user clicked "Tambah Item Lain" (which goes back to Category), choosing a category wiped the entire cart
+
+**Solution:** Removed `cart.clear()` from `selectCategory`. The cart is now only cleared in `handleOrderSubmit` after a successful order submission.
+
+**Files Changed:**
+- `src/js/components/step-manager.js` (width formula)
+- `src/js/order.js` (removed `cart.clear()` from `selectCategory`)
+
+**Testing:**
+- **Progress bar**: navigate through all steps and confirm the fill ends exactly at each active step's icon
+- **Multiple items**: add item 1 → Keranjang → "Tambah Item Lain" → add item 2 → confirm both items remain in Keranjang
+- Complete a full order and confirm `Keranjang`/cart resets only after submission
+
+---
+
+## Fix: Identity Lost on "Ubah Pesanan" + Confirm-Before-WhatsApp ✅ (v0.0.17)
+
+### Issue 1: Identity data lost when changing the order
+
+**Problem:** After reaching the Confirmation section, clicking "Ubah Pesanan" → back to Data Customer re-created an empty form, requiring the user to re-enter name/WhatsApp/address.
+
+**Root Cause:** `renderCustomerStep` created the form without passing `initialData`. The saved data lived in `sessionStorage['washpass_order_data'].customer`.
+
+**Solution:** `renderCustomerStep` now reads the saved order and passes `savedOrder.customer` as `initialData` to `initCustomerForm`, so the form repopulates on re-render.
+
+### Issue 2: Orders can't be confirmed / WhatsApp reliance
+
+**Problem:** Pressing "Kirim Pesanan via WhatsApp" gave no reliable feedback — the auto `window.open` redirect after the `await` is blocked by browsers as a non-user-gesture popup, and there was no on-page confirmation.
+
+**Requested behavior:** Confirm the order on the server side first, THEN send via WhatsApp (mocked/placeholder for now) so the order can be verified in admin.
+
+**Solution:**
+- Rewrote `handleOrderSubmit`:
+  1. Build FormData via `buildOrderFormData` (reads photo File objects from the **live cart**)
+  2. Submit to server → get `orderId` (confirm first)
+  3. Clear draft
+  4. Render `renderSuccessStep(orderId, orderData)` — on-page success screen with order number + status + "Kirim Ringkasan via WhatsApp" button (user-gesture, so popup works = mock/placeholder WA)
+- Fixed photos being dropped: items were stripped of File objects before sessionStorage; `buildOrderFormData` now pulls them from the live cart, so photos are preserved in the created order.
+- Server: `router.post('/')` now accepts `item.photos` as either an array or a plain count number (was broken with a number count, dropping photos).
+
+**Files Changed:**
+- `src/js/order.js` — `renderCustomerStep` (initialData), rewritten `handleOrderSubmit` + `buildOrderFormData` + `renderSuccessStep`
+- `src/css/pages/order.css` — `.order-success` styles
+- `server/routes/orders.js` — photos count handling
+
+**Testing:**
+- **Identity persistence**: fill Data Customer → Review → "Ubah Data Diri" → confirm fields are still filled
+- **Order confirmation**: full order (2 items, with a photo) → "Kirim Pesanan via WhatsApp" → on-page success screen shows order number; verify order appears in `/admin` with photo attached
+- **Server photos**: POST with `item.photos` as a number count → photo links to the correct item
+
+---
+
+## Fix: Konfirmasi Order Server-Side First + Mock WhatsApp ✅ (v0.0.18)
+
+### Requested behavior
+1. Rename the review button from "Kirim Pesanan via WhatsApp" → **"Konfirmasi Order"**
+2. Confirm the order **server-side/website first** (POST to `/api/orders`), THEN handle WhatsApp
+3. WhatsApp should be **mock/placeholder** so order confirmation works now, with a toggle to turn mock off for production
+
+### Changes
+- **`src/js/components/order-review.js`**: review submit button now reads **"Konfirmasi Order"**; loading state = "Mengonfirmasi order...".
+- **`src/js/order.js`** `handleOrderSubmit`:
+  - POSTs the order to the server FIRST and only on `orderId` success renders the success screen.
+  - Error alert text → "Gagal mengonfirmasi order: ...".
+  - `renderSuccessStep` renamed heading to **"Order Terkonfirmasi"** and shows a **"Mode Mock"** badge + "Kirim Ringkasan via WhatsApp (Mock)" label when mock is on.
+- **`src/js/utils/whatsapp.js`**: added `WHATSAPP_MOCK = true` flag + `isWhatsAppMock()` / `setWhatsAppMock()` / `toggleWhatsAppMock()`. Set `WHATSAPP_MOCK = false` (or `setWhatsAppMock(false)`) for production. Mock never blocks/affects confirmation.
+- **`server/routes/orders.js`**: 500 response now returns the real `error.message` so the actual cause of "Failed to create order" is visible.
+- **`src/css/pages/order.css`**: `.order-success__mock` badge styles.
+
+### Verified (E2E)
+1. POST `/api/orders` (2 items + 1 photo) → `{"orderId":1}`
+2. GET `/api/orders` (admin) → order #1 Budi Santoso, status pending, 2 items ✅
+3. GET `/api/orders/1` → shoe item has 1 photo attached ✅
+
+### Testing for the user
+- Run `pnpm run dev:all`
+- In order flow, on Review: button = "Konfirmasi Order"
+- Complete a full order → success screen shows the order number + "Mode Mock" badge
+- Open `/admin` → the confirmed order (with items/photos) is listed
+
+---
+
+## Bug: `NOT NULL constraint failed: order_items.category` on Confirm ✅ (v0.0.19)
+
+**Problem:** Pressing "Konfirmasi Order" showed `Gagal mengonfirmasi order: SQLITE_CONSTRAINT: NOT NULL constraint failed: order_items.category`.
+
+**Root Cause:**
+- Regression from v0.0.15: `selectCategory()` stopped storing the chosen `category` into the temp item (`sessionStorage['washpass_temp_item']`).
+- Sandals **skip the Material step** (so `selectMaterial` never runs), leaving `tempItem.category` empty.
+- The item was then sent to the server without a `category`, violating the NOT NULL constraint. (Sandal pricing/wash-type rendering was also broken for the same reason.)
+- Only traceable because v0.0.18 made the server return the real error message.
+
+**Solution:**
+- `selectCategory()` now writes `category` into the temp item and clears any stale `material` when switching to a non-sandal category, before advancing.
+
+**Files Changed:**
+- `src/js/order.js` — `selectCategory()`
+
+**Verified (E2E):**
+- Sandal-only order → succeeds, items have `category = 'sandal'`
+- Mixed shoe + sandal order → succeeds, items have `category = 'shoe'` / `'sandal'`
+- Orders appear in `/admin` as pending
+
+**Testing for the user:**
+- Run `pnpm run dev:all`
+- Complete a sandal order (fully through the sandal path) → "Konfirmasi Order" should succeed
+- Check `/admin` for the order with correct item categories
+- If the previous DB has bad rows, delete `server/db/washpass.db` and restart to reset
+
+---
+
+## Bug: Admin "Detail Pesanan" Modal Stuck on Loading ✅ (v0.0.20)
+
+**Problem:** In the admin panel, the "Detail Pesanan" modal stayed stuck on "Memuat detail..." with a spinning loader and could only be dismissed manually.
+
+**ROOT CAUSE:** `.admin-modal-overlay` CSS defaults to `display: flex`, and `OrderDetail.render()` never hid it. So the modal (with its loader) was shown **on every admin page load**, before any `open()` call. Since no fetch was ever triggered, the loader spun forever. Manual close was the only exit.
+
+**Fix:**
+- `OrderDetail.render()` now sets the overlay to `style="display: none"` by default; it only appears via `open()` (which sets `display: flex`).
+- Hardening so a spinner can never hang forever:
+  - `request()` (api.js) uses an `AbortController` with a 15s timeout.
+  - `OrderDetail.open()` resets loading content, runs `renderDetail()` inside the try/catch, and shows a clear "Gagal Memuat" error panel with a "Tutup" button on failure.
+
+**Files Changed:**
+- `src/js/components/order-detail.js`
+- `src/js/services/api.js`
+
+**Testing for the user:**
+- Load `/admin` → the modal should NOT appear until a row's "Detail" is clicked
+- Click "Detail" on a row → the modal opens and loads the detail; if the request fails/times out it shows a clear error instead of spinning forever

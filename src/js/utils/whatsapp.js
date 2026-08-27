@@ -2,12 +2,30 @@ import { formatCurrency } from './formatters.js';
 
 let WHATSAPP_NUMBER = '6281234567890'; // Ganti dengan nomor WA bisnis
 
+// Mock mode: when true, the WhatsApp step sends a placeholder message (wa.me link)
+// and never blocks order confirmation. Set to false when integrating a real
+// WhatsApp API for production.
+let WHATSAPP_MOCK = true;
+
 export function getWhatsAppNumber() {
   return WHATSAPP_NUMBER;
 }
 
 export function setWhatsAppNumber(number) {
   WHATSAPP_NUMBER = number;
+}
+
+export function isWhatsAppMock() {
+  return WHATSAPP_MOCK;
+}
+
+export function setWhatsAppMock(mock) {
+  WHATSAPP_MOCK = mock;
+}
+
+export function toggleWhatsAppMock() {
+  WHATSAPP_MOCK = !WHATSAPP_MOCK;
+  return WHATSAPP_MOCK;
 }
 
 export function generateWhatsAppMessage(orderData) {
@@ -66,9 +84,7 @@ export function redirectToWhatsApp(message) {
 export function submitOrderAndRedirect(orderData) {
   const message = generateWhatsAppMessage(orderData);
   redirectToWhatsApp(message);
-}
-
-function getMaterialLabel(material) {
+}function getMaterialLabel(material) {
   const labels = {
     'canvas': 'Kanvas / Textile',
     'mesh-knit': 'Mesh / Knit',
