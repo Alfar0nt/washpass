@@ -12,14 +12,26 @@ See [`.ai/tasks.md`](./.ai/tasks.md) for detailed feature documentation, known i
 
 ## Screenshots
 
-### Landing Page
-![Landing Page](pics/landing_page.png)
+Click an image to view it in fullscreen.
 
-### Order Flow
-![Order Flow](pics/order.png)
-
-### Admin Panel
-![Admin Panel](pics/admin.png)
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <a href="pics/landing_page.png"><img src="pics/landing_page.png" width="220" alt="Landing Page"></a><br>
+        <strong>Landing Page</strong>
+      </td>
+      <td align="center">
+        <a href="pics/order.png"><img src="pics/order.png" width="220" alt="Order Flow"></a><br>
+        <strong>Order Flow</strong>
+      </td>
+      <td align="center">
+        <a href="pics/admin.png"><img src="pics/admin.png" width="220" alt="Admin Panel"></a><br>
+        <strong>Admin Panel</strong>
+      </td>
+    </tr>
+  </table>
+</div>
 
 ## Pages
 
