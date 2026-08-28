@@ -304,14 +304,22 @@ export class OrderList {
     this.loadingState.style.display = 'none';
     this.emptyState.style.display = 'flex';
     this.emptyState.innerHTML = `
-      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--color-error)" stroke-width="1.5">
         <circle cx="12" cy="12" r="10" />
         <line x1="12" y1="8" x2="12" y2="12" />
         <line x1="12" y1="16" x2="12.01" y2="16" />
       </svg>
       <h3>Gagal Memuat</h3>
-      <p>${message}</p>
+      <p>${message}. Periksa koneksi Anda lalu coba lagi.</p>
+      <button type="button" class="btn btn-primary" id="retryBtn">
+        <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10" />
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+        </svg>
+        <span>Coba Lagi</span>
+      </button>
     `;
+    this.container.querySelector('#retryBtn')?.addEventListener('click', () => this.loadOrders());
   }
 }
 

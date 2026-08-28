@@ -1,8 +1,8 @@
 # WashPass — Tech Stack
 
-> **Versi:** 1.4  
-> **Tanggal:** 27 Agustus 2026  
-> **Update:** Phase 1-6 complete, build tested. Switched to `sqlite3` + `sqlite` (async) for Node.js 26 compatibility.
+> **Versi:** 1.5  
+> **Tanggal:** 28 Agustus 2026  
+> **Update:** Favicon + Web Manifest + Accessibility improvements + Micro-animations
 
 ---
 

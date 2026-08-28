@@ -13,6 +13,7 @@
   white-space: nowrap;
   text-decoration: none;
   user-select: none;
+  min-height: 44px;
 }
 
 .btn:disabled,
@@ -147,6 +148,8 @@
 .btn-icon {
   padding: var(--space-2);
   border-radius: var(--radius-full);
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .btn-icon.btn-sm {

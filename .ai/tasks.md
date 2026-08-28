@@ -259,28 +259,36 @@
 
 ## Phase 7: Polish & Optimization ⏳ **PENDING**
 
-- [ ] Micro-animations (hover, transisi, scroll-in)
-- [ ] Loading states untuk upload foto & submit order
-- [ ] Error states yang user-friendly (termasuk API error handling)
-- [ ] Empty states yang informatif
+### 7.1 User Experience Enhancements
+- [x] Micro-animations (hover, transisi, scroll-in)
+- [x] Loading states untuk upload foto & submit order
+- [x] Error states yang user-friendly (termasuk API error handling)
+- [x] Empty states yang informatif
 - [ ] Smooth scroll behavior
-- [ ] Touch-friendly interactions (min 44px targets)
+- [x] Touch-friendly interactions (min 44px targets)
+
+### 7.2 Testing & Compatibility
 - [ ] Cross-browser testing (Chrome, Firefox, Safari)
 - [ ] Mobile testing (responsive)
 - [ ] Tablet testing
+
+### 7.3 Performance & Quality Audits
 - [ ] Performance audit (Lighthouse)
 - [ ] Accessibility audit (contrast, labels, focus)
-- [ ] SEO meta tags + Open Graph
-- [ ] Favicon + web manifest
+- [x] SEO meta tags + Open Graph
+- [x] Favicon + web manifest
 
 ---
 
 ## Phase 8: Content & Assets ⏳ **PENDING**
 
+### 8.1 Brand Assets
 - [ ] Generate/buat logo WashPass
 - [ ] Generate ilustrasi hero section
 - [ ] Generate/buat ikon untuk bahan sepatu (canvas, mesh, kulit, suede)
 - [ ] Generate/buat ikon untuk how-it-works steps
+
+### 8.2 Content Creation
 - [ ] Tulis konten FAQ (5-6 items) — **Done in code**
 - [ ] Tulis meta description
 - [ ] Buat Open Graph image
@@ -294,6 +302,72 @@
 - [ ] Install `midtrans-client` npm package
 - [ ] Create `server/config/midtrans.js` — Midtrans client initialization (server key, client key, isProduction flag)
 - [ ] Create `server/routes/payment.js` — Midtrans payment routes:
+  - `POST /api/payment/create` — Create Snap transaction (generate snap token)
+  - `POST /api/payment/notification` — Webhook endpoint for Midtrans HTTP notifications
+  - `GET /api/payment/status/:orderId` — Check transaction status
+- [ ] Add `payment_status` column to `orders` table (`unpaid`, `paid`, `expired`, `failed`)
+- [ ] Add `snap_token` column to `orders` table (store Midtrans snap token)
+- [ ] Update `server/routes/orders.js` — Return `payment_status` in order responses
+
+### 9.2 Payment Flow (Snap Redirect)
+- [ ] After order review step, create Snap transaction via `POST /api/payment/create`
+- [ ] Redirect user to Midtrans Snap payment page (`window.location = snap.redirect_url`)
+- [ ] User selects payment method on Midtrans page (QRIS, GoPay, ShopeePay, Dana, VA, etc.)
+- [ ] After payment, Midtrans redirects back to WashPass success page
+- [ ] Create `src/payment-success.html` — Payment success/failure page with order summary
+- [ ] Handle `callback` and `finish` redirect URLs from Midtrans
+
+### 9.3 Webhook Handler
+- [ ] Receive HTTP notification from Midtrans (`POST /api/payment/notification`)
+- [ ] Verify notification authenticity (Midtrans signature validation)
+- [ ] Update order `payment_status` based on notification:
+  - `settlement` → `paid`
+  - `pending` → `unpaid`
+  - `expire` → `expired`
+  - `cancel` / `deny` → `failed`
+- [ ] Update order `status` to `picked_up` when payment is `paid`
+
+### 9.4 Order Flow Update
+- [ ] Modify review step: add "Bayar Sekarang" button (primary CTA)
+- [ ] Add "Kirim via WhatsApp" button as fallback (secondary CTA)
+- [ ] Show payment status badge on order review/success page
+- [ ] Store order to server BEFORE redirecting to Midtrans (already done, but verify)
+
+### 9.5 Admin Panel Update
+- [ ] Show `payment_status` badge in order list table and cards
+- [ ] Show `payment_status` in order detail modal
+- [ ] Filter orders by payment status
+- [ ] Show payment method used (from Midtrans notification)
+
+### 9.6 Configuration & Environment
+- [ ] Add Midtrans env vars to `.env.example`: `MIDTRANS_SERVER_KEY`, `MIDTRANS_CLIENT_KEY`, `MIDTRANS_IS_PRODUCTION`
+- [ ] Add Midtrans sandbox credentials to README (how to get keys)
+- [ ] Handle sandbox vs production environment
+
+### 9.7 Testing
+- [ ] Test QRIS payment flow (scan QR code)
+- [ ] Test GoPay/ShopeePay payment flow
+- [ ] Test bank transfer (VA) payment flow
+- [ ] Test payment failure/expiry handling
+- [ ] Test webhook notification handling
+- [ ] Test WhatsApp fallback flow
+- [ ] Verify order status updates correctly after payment
+
+### Files to Create
+- `server/config/midtrans.js`
+- `server/routes/payment.js`
+- `src/payment-success.html`
+- `src/js/payment-success.js`
+- `src/css/pages/payment-success.css`
+
+### Files to Modify
+- `server/db/schema.js` — add payment_status, snap_token columns
+- `server/routes/orders.js` — return payment_status in responses
+- `src/js/order.js` — modify review step with "Bayar Sekarang" + "Kirim via WA"
+- `src/js/components/order-list.js` — add payment status badge
+- `src/js/components/order-detail.js` — add payment info section
+- `src/js/services/api.js` — add payment API calls
+- `.env.example` — add Midtrans env vars
   - `POST /api/payment/create` — Create Snap transaction (generate snap token)
   - `POST /api/payment/notification` — Webhook endpoint for Midtrans HTTP notifications
   - `GET /api/payment/status/:orderId` — Check transaction status
@@ -375,6 +449,18 @@
 | Phase 6: Logic | ✅ Done | ~1.5-2.5 jam |
 | Phase 7: Polish | ⏳ Pending | ~1-2 jam |
 | Phase 8: Content | ⏳ Pending | ~1 jam |
+| Phase 9: Payment Gateway | ⏳ Pending | ~4-6 jam |
+| Phase 10: Deployment | ⏳ Pending | ~2-3 jam |
+
+---
+
+## Catatan Prioritas
+
+1. **P0 (Must Have):** Backend API + Landing page + Order flow + WA redirect + Order storage + Location sharing + Enhanced status flow + **Payment Gateway (Midtrans)**
+2. **P1 (Should Have):** Admin order list + Responsive design + Validasi form + Photo upload ke server + Map di admin + Status dropdown + Image compression + **Payment status tracking**
+3. **P2 (Nice to Have):** Scroll animations, glassmorphism effects, loading states, status update
+
+---
 | Phase 9: Payment Gateway | ⏳ Pending | ~4-6 jam |
 | **Total** | | **~18-26 jam kerja** |
 
@@ -706,9 +792,177 @@
 
 ---
 
-## Bug Fixes Applied - v0.0.7 (Upcoming)
+## Known Issues / Bugs ⚠️
 
-### Fix #1: Step Navigation Stuck After Customer Form ✅
+### Bug: Back Button Goes to Wrong Section for Sandals
+
+**Severity:** Medium
+**Status:** Fixed (v0.0.22)
+
+**Symptoms:**
+- When choosing "Sandal" in category step → goes to Wash Type step (correct)
+- When clicking "Back/Kembali" in Wash Type step for sandals → goes to Material step (wrong, should go to Category)
+
+**Root Cause:**
+- The wash type step's back button used generic `stepManager.previous()`
+- No check for which step we're navigating from
+- Sandals skip material step but back button still tries to go to material
+
+**Fix Applied (v0.0.22):**
+- Added category detection in wash type back button
+- For sandals: back to category step
+- For shoes: back to material step
+- Also fixed category selection logic:
+  - Shoes: complete current step, go to next
+  - Sandals: skip material step, go directly to washType without completing current
+
+**Files Changed:**
+- `src/js/order.js` — `selectCategory()` and back button in washType step
+
+**Verification:**
+- ✅ Sandal flow: Category → Wash Type → back to Category
+- ✅ Shoe flow: Category → Material → back to Material
+- ✅ Category selection logic now handles both types correctly
+
+---
+
+## Bug Fixes Applied - v0.0.22
+
+### Fix #1: Back Button Goes to Wrong Section for Sandals ✅
+
+**Issue:** When choosing "Sandal" and clicking back in the Wash Type step, the back button went to Material step instead of going back to Category step.
+
+**Root Cause:**
+- The wash type step's back button used generic `stepManager.previous()`
+- No check for which step we're navigating from
+- Sandals skip material step but back button still tries to go to material
+
+**Solution:**
+- Added category detection in wash type back button
+- For sandals: back to category step
+- For shoes: back to material step
+- Also fixed category selection logic:
+  - Shoes: complete current step, go to next
+  - Sandals: skip material step, go directly to washType without completing current
+
+**Files Changed:**
+- `src/js/order.js` — `selectCategory()` and back button in washType step
+
+**Testing:**
+- **Sandal flow:** Category → Wash Type → back to Category
+- **Shoe flow:** Category → Material → back to Material
+- **Category selection:** Logic now handles both types correctly
+
+---
+
+### Fix #2: Step Navigation Stuck After Customer Form ✅ (v0.0.17)
+
+**Issue:** User fills customer form, clicks "Review Pesanan" but gets stuck on same page
+
+**Root Cause:** 
+- Cart items were being saved directly to sessionStorage with File objects (photos)
+- File objects cannot be serialized to JSON, causing data loss
+- No error handling or logging to debug navigation failures
+
+**Solution:**
+- Modified `handleCustomerSubmit()` to map cart items and exclude File objects
+- Added `photoCount` field instead of full photos array
+- Added comprehensive console logging for debugging
+- Added validation to check if step navigation succeeds
+
+**Files Changed:**
+- `src/js/order.js` (lines 528-558)
+
+**Testing:**
+- Navigate through order flow: Category → Material → Wash Type → Photos → Cart → Customer → Review
+- Fill customer form with valid data
+- Click "Review Pesanan" button
+- Should successfully navigate to Review step
+- All form data should persist in sessionStorage
+- Admin panel should show saved orders
+
+---
+
+### Fix #3: Konfirmasi Order Server-Side First + Mock WhatsApp ✅ (v0.0.18)
+
+**Requested behavior**
+1. Rename the review button from "Kirim Pesanan via WhatsApp" → **"Konfirmasi Order"**
+2. Confirm the order **server-side/website first** (POST to `/api/orders`), THEN handle WhatsApp
+3. WhatsApp should be **mock/placeholder** so order confirmation works now, with a toggle to turn mock off for production
+
+**Changes**
+- **`src/js/components/order-review.js`**: review submit button now reads **"Konfirmasi Order"**; loading state = "Mengonfirmasi order...".
+- **`src/js/order.js`** `handleOrderSubmit`:
+  - POSTs the order to the server FIRST and only on `orderId` success renders the success screen.
+  - Error alert text → "Gagal mengonfirmasi order: ...".
+  - `renderSuccessStep` renamed heading to **"Order Terkonfirmasi"** and shows a **"Mode Mock"** badge + "Kirim Ringkasan via WhatsApp (Mock)" label when mock is on.
+- **`src/js/utils/whatsapp.js`**: added `WHATSAPP_MOCK = true` flag + `isWhatsAppMock()` / `setWhatsAppMock()` / `toggleWhatsAppMock()`. Set `WHATSAPP_MOCK = false` (or `setWhatsAppMock(false)`) for production. Mock never blocks/affects confirmation.
+- **`server/routes/orders.js`**: 500 response now returns the real `error.message` so the actual cause of "Failed to create order" is visible.
+- **`src/css/pages/order.css`**: `.order-success__mock` badge styles.
+
+**Verified (E2E)**
+1. POST `/api/orders` (2 items + 1 photo) → `{"orderId":1}`
+2. GET `/api/orders` (admin) → order #1 Budi Santoso, status pending, 2 items ✅
+3. GET `/api/orders/1` → shoe item has 1 photo attached ✅
+
+**Testing for the user**
+- Run `pnpm run dev:all`
+- In order flow, on Review: button = "Konfirmasi Order"
+- Complete a full order → success screen shows the order number + "Mode Mock" badge
+- Open `/admin` → the confirmed order (with items/photos) is listed
+
+---
+
+### Fix #4: `NOT NULL constraint failed: order_items.category` on Confirm ✅ (v0.0.19)
+
+**Problem:** Pressing "Konfirmasi Order" showed `Gagal mengonfirmasi order: SQLITE_CONSTRAINT: NOT NULL constraint failed: order_items.category`.
+
+**Root Cause:**
+- Regression from v0.0.15: `selectCategory()` stopped storing the chosen `category` into the temp item (`sessionStorage['washpass_temp_item']`).
+- Sandals **skip the Material step** (so `selectMaterial` never runs), leaving `tempItem.category` empty.
+- The item was then sent to the server without a `category`, violating the NOT NULL constraint. (Sandal pricing/wash-type rendering was also broken for the same reason.)
+- Only traceable because v0.0.18 made the server return the real error message.
+
+**Solution:**
+- `selectCategory()` now writes `category` into the temp item and clears any stale `material` when switching to a non-sandal category, before advancing.
+
+**Files Changed:**
+- `src/js/order.js` — `selectCategory()`
+
+**Verified (E2E):**
+- Sandal-only order → succeeds, items have `category = 'sandal'`
+- Mixed shoe + sandal order → succeeds, items have `category = 'shoe'` / `'sandal'`
+- Orders appear in `/admin` (GET `/api/orders`) as pending
+
+**Testing for the user:**
+- Run `pnpm run dev:all`
+- Complete a sandal order (fully through the sandal path) → "Konfirmasi Order" should succeed
+- Check `/admin` for the order with correct item categories
+- If the previous DB has bad rows, delete `server/db/washpass.db` and restart to reset
+
+---
+
+### Fix #5: Admin "Detail Pesanan" Modal Stuck on Loading ✅ (v0.0.20)
+
+**Problem:** In the admin panel, the "Detail Pesanan" modal stayed stuck on "Memuat detail..." with a spinning loader and could only be dismissed manually.
+
+**ROOT CAUSE:** `.admin-modal-overlay` CSS defaults to `display: flex`, and `OrderDetail.render()` never hid it. So the modal (with its loader) was shown **on every admin page load**, before any `open()` call. Since no fetch was ever triggered, the loader spun forever. Manual close was the only exit.
+
+**Fix:**
+- `OrderDetail.render()` now sets the overlay to `style="display: none"` by default, so the modal only appears when the user clicks a row (which calls `open()` → `display: flex`).
+- Hardening so a spinner can never hang forever:
+  - `request()` in `src/js/services/api.js` now uses an `AbortController` with a 25s timeout.
+  - `OrderDetail.open()` resets the loading content at open, wraps `renderDetail()` inside the try/catch, and shows a clear error panel ("Gagal Memuat") with a working "Tutup" button on any failure.
+
+**Files Changed:**
+- `src/js/components/order-detail.js`
+- `src/js/services/api.js`
+
+**Testing for the user:**
+- Load `/admin` → the modal should NOT appear until a row's "Detail" is clicked
+- Click "Detail" on a row → the modal opens and loads the detail; if the request fails/times out it shows a clear error instead of spinning forever
+
+---
 
 **Issue:** User fills customer form, clicks "Review Pesanan" but gets stuck on same page
 

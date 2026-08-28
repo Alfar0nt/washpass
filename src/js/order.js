@@ -182,9 +182,13 @@ function selectCategory(category) {
   sessionStorage.setItem('washpass_temp_item', JSON.stringify(tempItem));
 
   stepManager.setStepValid('category', true);
-  stepManager.completeCurrentStep();
-  // Sandal has no material step — skip straight to wash type selection
-  if (category === 'sandal') {
+  
+  // For shoes: complete current step and go to next
+  if (category === 'shoe') {
+    stepManager.completeCurrentStep();
+  } else {
+    // For sandals: skip material step, go directly to washType
+    // Don't complete current step - just set validation and let step flow handle navigation
     stepManager.goToStep(STEP_ORDER.indexOf('washType'));
   }
 }
@@ -298,7 +302,16 @@ function renderWashTypeStep(container) {
     container.querySelectorAll('.wash-type-card').forEach(card => {
       card.addEventListener('click', () => selectWashType(card.dataset.washType));
     });
-    container.querySelector('#backToPrevious')?.addEventListener('click', () => stepManager.previous());
+    container.querySelector('#backToPrevious')?.addEventListener('click', () => {
+      const tempItem = JSON.parse(sessionStorage.getItem('washpass_temp_item') || '{}');
+      // For sandals: go back to category
+      if (tempItem.category === 'sandal') {
+        stepManager.goToStep(STEP_ORDER.indexOf('category'));
+      } else {
+        // For shoes: go back to material
+        stepManager.previous();
+      }
+    });
     container.querySelector('#goToCart')?.addEventListener('click', () => stepManager.goToStep(STEP_ORDER.indexOf('cart')));
   });
 }
