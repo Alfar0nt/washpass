@@ -29,6 +29,20 @@ if (NODE_ENV === 'production') {
   const distPath = path.join(__dirname, '..', 'dist');
   app.use(express.static(distPath));
   
+  // Clean URL routing: map /order, /admin, /privacy, /terms to their HTML files
+  const staticPages = {
+    '/order': 'order.html',
+    '/admin': 'admin.html',
+    '/privacy': 'privacy.html',
+    '/terms': 'terms.html',
+  };
+
+  Object.entries(staticPages).forEach(([route, file]) => {
+    app.get(route, (req, res) => {
+      res.sendFile(path.join(distPath, file));
+    });
+  });
+
   app.get('*', (req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
   });

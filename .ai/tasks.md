@@ -1,9 +1,9 @@
 # WashPass — Task Breakdown
 
-> **Versi:** 0.0.21  
-> **Tanggal:** 27 Agustus 2026  
-> **Status:** Phase 1-6 Completed — Phase 7, 8, 9 Remaining  
-> **Update:** Admin image modal + direct cart access + step validation
+> **Versi:** 0.0.24  
+> **Tanggal:** 28 Agustus 2026  
+> **Status:** Phase 1-6 Completed — Phase 7, 8.1, 9 Remaining  
+> **Update:** Phase 8.2 content (OG image, privacy + terms pages, README screenshots)
 
 ---
 
@@ -280,7 +280,7 @@
 
 ---
 
-## Phase 8: Content & Assets ⏳ **PENDING**
+## Phase 8: Content & Assets ⏳ **PENDING** (8.2 completed)
 
 ### 8.1 Brand Assets
 - [ ] Generate/buat logo WashPass
@@ -288,11 +288,13 @@
 - [ ] Generate/buat ikon untuk bahan sepatu (canvas, mesh, kulit, suede)
 - [ ] Generate/buat ikon untuk how-it-works steps
 
-### 8.2 Content Creation
-- [ ] Tulis konten FAQ (5-6 items) — **Done in code**
-- [ ] Tulis meta description
-- [ ] Buat Open Graph image
-- [ ] Screenshot untuk README
+### 8.2 Content Creation ✅ **COMPLETED**
+- [x] Tulis konten FAQ (5-6 items) — **Done in code**
+- [x] Tulis meta description
+- [x] Buat Open Graph image
+- [x] Screenshot untuk README
+- [x] Tulis halaman Privacy Policy (kebijakan privasi)
+- [x] Tulis halaman Syarat & Ketentuan (terms & conditions)
 
 ---
 
@@ -823,6 +825,38 @@
 - ✅ Sandal flow: Category → Wash Type → back to Category
 - ✅ Shoe flow: Category → Material → back to Material
 - ✅ Category selection logic now handles both types correctly
+
+---
+
+## Bug Fixes Applied - v0.0.23
+
+### Fix #1: Progress Indicator Not Resetting After Changing a Previous Choice ✅
+
+**Issue:** When a user went back to an earlier step (e.g. Pilih Item) and made a **new/changed choice** (e.g. switched from "Sepatu" to "Sandal", or changed Bahan / Tipe Cuci), the step indicator on top stayed green for all downstream steps. Because those steps were still in `completedSteps`, the indicator incorrectly showed the whole flow as done even though the user was re-doing that part.
+
+**Root Cause:**
+- `StepManager.completedSteps` retained steps even after the user navigated back and re-selected a new option.
+- Selection handlers (`selectCategory`, `selectMaterial`, `selectWashType`) never cleared the completed/validation state of the steps after them.
+
+**Solution:**
+- Added a new `resetFrom(index)` method to `StepManager` (step-manager.js) that clears completed + validation state for every step at and after the given index, then refreshes the display.
+- Called `resetFrom()` inside the selection handlers in `src/js/order.js`:
+  - `selectCategory()` — resets steps after "Pilih Item" (material → konfirmasi)
+  - `selectMaterial()` — resets steps after "Bahan" (tipe cuci → konfirmasi)
+  - `selectWashType()` — resets steps after "Tipe Cuci" (foto → konfirmasi)
+
+**Behavior Notes:**
+- **Double-check scenario preserved**: going back and reviewing without clicking a new option keeps the green states (reset only fires on an active selection/lik-click).
+- This matches the intent of "going back and making a new choice/change".
+
+**Files Changed:**
+- `src/js/components/step-manager.js` — added `resetFrom(index)`; `reset()` also clears validations
+- `src/js/order.js` — `selectCategory()`, `selectMaterial()`, `selectWashType()`
+
+**Testing:**
+- Go to Pilih Item → choose Sandal → proceed to Tipe Cuci → back → choose Sepatu → **Bahan & Tipe Cuci indicators reset (no longer green)**
+- Go back without clicking (just review) → navigate forward → previous green states remain
+- Re-choose the same category after going back → downstream still resets (a click = a new choice)
 
 ---
 

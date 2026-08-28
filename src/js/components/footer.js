@@ -84,8 +84,8 @@ export class Footer {
           <div class="footer__bottom">
             <p class="footer__copyright">&copy; 2024 WashPass. Semua hak dilindungi.</p>
             <nav class="footer__legal" aria-label="Legal links">
-              <a href="#" class="footer__legal-link">Kebijakan Privasi</a>
-              <a href="#" class="footer__legal-link">Syarat & Ketentuan</a>
+              <a href="/privacy" class="footer__legal-link">Kebijakan Privasi</a>
+              <a href="/terms" class="footer__legal-link">Syarat & Ketentuan</a>
             </nav>
           </div>
         </div>

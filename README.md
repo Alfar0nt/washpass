@@ -4,11 +4,32 @@ Website jasa cuci sepatu & sandal profesional dengan sistem pickup & delivery.
 
 ## Status
 
-**Phase 1-6 Complete** | **Phase 7-8 Pending**
+**Phase 1-6 Complete** | **Phase 7-8.2 Pending**
 
 See [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) for version history and changelog.
 
 See [`.ai/tasks.md`](./.ai/tasks.md) for detailed feature documentation, known issues, and action items.
+
+## Screenshots
+
+### Landing Page
+![Landing Page](pics/landing_page.png)
+
+### Order Flow
+![Order Flow](pics/order.png)
+
+### Admin Panel
+![Admin Panel](pics/admin.png)
+
+## Pages
+
+| URL | Description |
+|-----|-------------|
+| `/` | Landing page |
+| `/order` | Order flow |
+| `/admin` | Admin panel |
+| `/privacy` | Privacy policy |
+| `/terms` | Terms & conditions |
 
 ## Development
 
@@ -40,14 +61,6 @@ pnpm run start
 - **Location**: Browser Geolocation API + Nominatim reverse geocoding
 - **CSS**: Vanilla CSS + Custom Properties (Design Tokens)
 - **Fonts**: Plus Jakarta Sans + Inter (Google Fonts)
-
-## URLs
-
-| URL | Status |
-|-----|--------|
-| `/` | Landing page |
-| `/order` | Order flow |
-| `/admin` | Admin panel |
 
 ## Next Steps
 

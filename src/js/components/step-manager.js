@@ -183,6 +183,16 @@ export class StepManager {
   reset() {
     this.currentStepIndex = 0;
     this.completedSteps.clear();
+    this.stepValidations.clear();
+    this.updateDisplay();
+  }
+
+  resetFrom(index) {
+    for (let i = index; i < this.steps.length; i++) {
+      const stepId = this.steps[i].id;
+      this.completedSteps.delete(stepId);
+      this.stepValidations.delete(stepId);
+    }
     this.updateDisplay();
   }
 

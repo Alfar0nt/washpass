@@ -182,6 +182,9 @@ function selectCategory(category) {
   sessionStorage.setItem('washpass_temp_item', JSON.stringify(tempItem));
 
   stepManager.setStepValid('category', true);
+  // The user is making a new choice, so reset any downstream steps that
+  // may have been completed on a previous pass (keeps the indicator honest).
+  stepManager.resetFrom(STEP_ORDER.indexOf('category') + 1);
   
   // For shoes: complete current step and go to next
   if (category === 'shoe') {
@@ -246,6 +249,8 @@ function selectMaterial(material) {
   const tempItem = { category: 'shoe', material };
   sessionStorage.setItem('washpass_temp_item', JSON.stringify(tempItem));
   stepManager.setStepValid('material', true);
+  // New material choice resets the downstream steps for the rest of the flow.
+  stepManager.resetFrom(STEP_ORDER.indexOf('material') + 1);
   stepManager.completeCurrentStep();
 }
 
@@ -326,6 +331,8 @@ function selectWashType(washType) {
     : PRICING.shoe[tempItem.material]?.[washType] || 0;
   sessionStorage.setItem('washpass_temp_item', JSON.stringify(tempItem));
   stepManager.setStepValid('washType', true);
+  // New wash type choice resets the downstream steps for the rest of the flow.
+  stepManager.resetFrom(STEP_ORDER.indexOf('washType') + 1);
   stepManager.completeCurrentStep();
 }
 

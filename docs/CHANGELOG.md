@@ -2,6 +2,72 @@
 
 ---
 
+## [v0.0.24] - 2026-08-28
+
+### Phase 8.2 — Content Creation ✅
+
+### Added
+- **Open Graph image** (`public/og-image.png`, 1200×630, brand teal gradient with WashPass branding):
+  - Linked via `og:image` (+ width/height/alt) on landing, order, privacy, and terms pages.
+  - Twitter card upgraded from `summary` to `summary_large_image` with `twitter:image` on the landing page.
+- **Privacy Policy page** (`/privacy` → `src/privacy.html`):
+  - New page with 7 privacy-related sections (collected data, usage, storage, third parties, security, user rights, policy changes) plus last-updated date.
+  - Rendered by `src/js/privacy.js`, reuses the global styles + footer component.
+- **Terms & Conditions page** (`/terms` → `src/terms.html`):
+  - New page with 10 terms-related sections (acceptance, services, minimum order, pricing & payment, item condition & liability, photos & documentation, cancellation & changes, liability limits, changes to terms, governing law & contact) plus last-updated date.
+  - Rendered by `src/js/terms.js`.
+  - Footer "Kebijakan Privasi" and "Syarat & Ketentuan" legal links now point to `/privacy` and `/terms` (were `#`).
+
+### Changed
+- **README**: Added a "Screenshots" section using the new `pics/` screenshots (landing, order, admin) and a "Pages" table including `/privacy` and `/terms`.
+- **Vite config** (`vite.config.js`): Registered `privacy.html` and `terms.html` as build inputs and added clean-URL rewrites so `/order`, `/admin`, `/privacy`, `/terms` work in dev; set `appType: 'mpa'`.
+- **Express production server** (`server/index.js`): Added clean-URL routing mapping `/order`, `/admin`, `/privacy`, `/terms` to their HTML files (previously the catch-all served `index.html` for these, which would have broken direct navigation).
+- **Legal pages share styling**: Both privacy and terms pages use a single shared `src/css/pages/legal.css` (was `privacy.css`).
+
+### Meta descriptions
+Meta descriptions were already present; verified on landing, order, admin, privacy, and terms pages.
+
+### Files Changed
+- `src/privacy.html` (new)
+- `src/terms.html` (new)
+- `src/js/privacy.js` (new)
+- `src/js/terms.js` (new)
+- `src/css/pages/legal.css` (new, shared by privacy + terms; replaces `privacy.css`)
+- `public/og-image.png` (new)
+- `src/index.html` — og:image + Twitter large image
+- `src/order.html` — og:image
+- `src/js/components/footer.js` — privacy + terms links
+- `vite.config.js` — privacy/terms inputs + clean URLs
+- `server/index.js` — clean-URL routing
+- `README.md` — screenshots + pages table
+- `.ai/tasks.md` — Phase 8.2 marked complete
+
+---
+
+## [v0.0.23] - 2026-08-28
+
+### Fixed
+- **Progress indicator not resetting after changing a previous choice**:
+  - When a user went back to an earlier step and made a **new/changed choice** (e.g. switched from "Sepatu" to "Sandal" at Pilih Kategori, or changed Bahan/Tipe Cuci), the step indicator on top stayed green for the downstream steps. Because those steps were still in the `completedSteps` set, the indicator incorrectly showed the whole flow as done even though the user was re-doing that part.
+  - Now, when a user makes a new selection on a step, all steps after it are reset (their completed + validation state cleared), so the progress indicator accurately reflects that a fresh choice was made.
+
+### Solution
+- Added a new `resetFrom(index)` method to `StepManager` (`src/js/components/step-manager.js`) that clears the completed/validation state for every step at and after the given index, then refreshes the display.
+- Called `resetFrom()` inside the three selection handlers in `src/js/order.js`:
+  - `selectCategory()` — resets steps after "Pilih Item" (material → konfirmasi)
+  - `selectMaterial()` — resets steps after "Bahan" (tipe cuci → konfirmasi)
+  - `selectWashType()` — resets steps after "Tipe Cuci" (foto → konfirmasi)
+
+### Behavior Notes
+- **Double-check scenario preserved**: If the user goes back a step but does **not** click a new option (just reviews and then navigates forward again via the step indicator / forward buttons), the green states stay intact.
+- The reset only triggers when the user actively **chooses** a new option (clicks a card), matching the intent behind "making a new choice/change".
+
+### Files Changed
+- `src/js/components/step-manager.js` — added `resetFrom(index)`; also made `reset()` clear validations for consistency
+- `src/js/order.js` — `selectCategory()`, `selectMaterial()`, `selectWashType()`
+
+---
+
 ## [v0.0.22] - 2026-08-28
 
 ### Added
