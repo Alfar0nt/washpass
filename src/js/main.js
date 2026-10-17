@@ -60,8 +60,6 @@ function init() {
   });
   
   initFooter(document.getElementById('footer'));
-  
-  console.log('WashPass Landing Page loaded');
 }
 
 if (document.readyState === 'loading') {

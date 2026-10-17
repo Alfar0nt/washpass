@@ -86,12 +86,10 @@ function loadCartFromStorage() {
 }
 
 function handleStepChange(step, index) {
-  console.log('Step changed to:', step.id, 'Index:', index);
   renderStep(step.id);
 }
 
 function handleStepComplete(step, index) {
-  console.log('Step completed:', step.id);
 }
 
 function renderStep(stepId) {
@@ -677,9 +675,6 @@ function renderCustomerStep(container) {
 function handleCustomerSubmit(formData) {
   const allItems = cart.getItems();
   
-  console.log('Cart items:', allItems);
-  console.log('Customer form data:', formData);
-  
   const orderData = {
     items: allItems.map(item => ({
       id: item.id,
@@ -698,25 +693,17 @@ function handleCustomerSubmit(formData) {
     longitude: formData.longitude,
   };
 
-  console.log('Order data to save:', orderData);
-  
   try {
     sessionStorage.setItem('washpass_order_data', JSON.stringify(orderData));
-    const saved = sessionStorage.getItem('washpass_order_data');
-    console.log('SessionStorage saved:', saved ? '✓' : '✗');
   } catch (e) {
     console.error('Failed to save order data:', e);
   }
   
-  console.log('Current step before complete:', stepManager.getCurrentStepIndex());
   stepManager.completeCurrentStep();
-  console.log('Current step after complete:', stepManager.getCurrentStepIndex());
 }
 
 function renderReviewStep(container) {
   const orderData = JSON.parse(sessionStorage.getItem('washpass_order_data') || '{}');
-  
-  console.log('Rendering review step, orderData:', orderData);
   
   if (!orderData.items || orderData.items.length === 0) {
     console.warn('No items in orderData, redirecting to cart');

@@ -20,6 +20,8 @@ Instruksi dan standar kerja autonomous agent di codebase WashPass.
 2. **Komunikasi & Konfirmasi Bebas Halusinasi**:
    - **Selalu tanyakan dan konfirmasi ke user** setelah menerima prompt jika terdapat instruksi yang ambigu, tidak lengkap, atau memiliki lebih dari satu arah implementasi.
    - Jangan berasumsi atau membuat kesimpulan sendiri pada requirement yang samar untuk mencegah halusinasi.
+   
+3. gunakan command nvm use 24.20.0 terlebih dahulu jika ingin menggunakan command nodejs/npm
 
 ## Tech Stack Overview
 - **Frontend Build**: Vite (Vanilla JS, ES Modules)

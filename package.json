@@ -1,6 +1,6 @@
 {
   "name": "washpass",
-  "version": "v0.0.25",
+  "version": "v0.0.26",
   "description": "Website jasa pencucian sepatu dan sandal dengan sistem pick-up → cuci → antar kembali",
   "type": "module",
   "scripts": {
@@ -14,7 +14,6 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",
-    "leaflet": "^1.9.4",
     "multer": "^1.4.5-lts.1",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",

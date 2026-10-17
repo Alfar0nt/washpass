@@ -6,7 +6,10 @@ Status komprehensif implementasi proyek WashPass. Pekerjaan tertunda diletakkan 
 
 ## ⏳ PENDING & NEXT TASKS (Prioritas Utama)
 
-### 1. Phase 7: Polish & Optimization
+### 1. Security Backlog
+- [ ] **Dependency Upgrade**: `multer@1.4.5-lts` punya kerentanan yang dipatch di 2.x, dan `uuid@9` sudah deprecated. Upgrade bersifat breaking → dikerjakan terpisah.
+
+### 2. Phase 7: Polish & Optimization
 - [ ] **7.1 Smooth Scroll & Micro-interactions**: Verifikasi konsistensi smooth scrolling lintas browser di landing page.
 - [ ] **7.2 Testing & Device Compatibility**:
   - [ ] Cross-browser check (Brave/Chromium di Manjaro, Firefox, WebKit/Safari mobile view).
@@ -15,14 +18,14 @@ Status komprehensif implementasi proyek WashPass. Pekerjaan tertunda diletakkan 
   - [ ] Lighthouse audit (target $\ge 90$ untuk Performance, Accessibility, Best Practices, SEO) menggunakan Brave browser.
   - [ ] Accessibility contrast & keyboard navigation review (WCAG AA).
 
-### 2. Phase 8.1: Brand Assets
+### 3. Phase 8.1: Brand Assets
 - [ ] **Asset Desain**:
   - [ ] Logo resmi WashPass (vector SVG).
   - [ ] Ilustrasi visual hero section.
   - [ ] Custom SVG iconography untuk material sepatu (kanvas, kulit, suede, mesh, rubber).
   - [ ] Step visual iconography pada section Cara Kerja.
 
-### 3. Phase 9: Payment Gateway (Midtrans Snap)
+### 4. Phase 9: Payment Gateway (Midtrans Snap)
 - [ ] **9.1 Backend Setup**:
   - [ ] Install dependensi `midtrans-client`.
   - [ ] Setup `server/config/midtrans.js` & router `server/routes/payment.js`.
@@ -38,6 +41,7 @@ Status komprehensif implementasi proyek WashPass. Pekerjaan tertunda diletakkan 
 
 | Phase | Ruang Lingkup | Status | Rangkuman Hasil |
 |---|---|---|---|
+| **Phase 0: Housekeeping & Cleanup** | Repo hygiene & language stats | ✅ Selesai (2026-10-17) | Hapus `.opencode/skills` duplikat (byte-identik `.agents/skills`) + `__pycache__`; hapus `SKILL.md` rusak (209 KB HTML); `.gitattributes linguist-vendored` fix deteksi ~70% Python; fix Leaflet JS tak termuat di admin/order; hapus dep `leaflet` & 12 debug `console.log`; track `find-skills` + `skills-lock.json`. |
 | **Phase 1: Project Setup** | Vite + Express + SQLite setup | ✅ Selesai | Struktur monorepo mini, script dev/build, reset CSS & variable tokens, Google Fonts. |
 | **Phase 2: Backend API** | Express REST & Database | ✅ Selesai | SQLite schema (`orders`, `order_items`, `order_photos`), Multer multipart upload, CRUD `/api/orders`, status patch transition validation. |
 | **Phase 3: Landing Page** | 7 Section Halaman Utama | ✅ Selesai | Navbar sticky dinamis (`ResizeObserver`), Hero dengan trust badge, Cara Kerja, Keunggulan, Tabel Harga dengan tab toggle, FAQ accordion, Footer. |

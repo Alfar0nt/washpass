@@ -40,3 +40,7 @@ coverage/
 # Misc
 *.pem
 .cache/
+
+# Python artifacts (agent skill scripts)
+__pycache__/
+*.pyc

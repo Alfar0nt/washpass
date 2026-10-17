@@ -2,6 +2,27 @@
 
 ---
 
+## [v0.0.26] - 2026-10-17
+
+### Removed
+- Folder `.opencode/skills/` duplikat (byte-identik dengan `.agents/skills/`) beserta 3 artefak `__pycache__/*.pyc` yang ter-track.
+- File `.agents/skills/SKILL.md` rusak (209 KB halaman HTML GitHub, hasil unduhan gagal).
+- Dependency npm `leaflet` yang tidak lagi diimpor (Leaflet dilayani via CDN).
+
+### Fixed
+- **Peta Leaflet tidak dirender**: Leaflet JS tidak pernah dimuat (hanya CSS). Menambahkan `<script>` CDN Leaflet 1.9.4 + SRI pada `src/admin.html` dan `src/order.html`.
+- Menghapus 12 `console.log` debug pada alur order (`src/js/order.js`) dan landing (`src/js/main.js`).
+
+### Changed
+- Menambahkan `.gitattributes`: `.agents/skills/** linguist-vendored` agar GitHub Linguist tidak menghitung Python dari skill pack (memperbaiki deteksi bahasa repo yang sebelumnya ~70% Python).
+- `.gitignore`: menambahkan `__pycache__/` dan `*.pyc`.
+- Menambahkan tracking `.agents/skills/find-skills/` + `.agents/skills/skills-lock.json` agar skill tersedia di mesin lain/kolaborator.
+
+### Added
+- Skill global untuk Phase 7.3: `accessibility`, `web-quality-audit`, `seo` (dari `addyosmani/web-quality-skills`).
+
+---
+
 ## [v0.0.25] - 2026-10-17
 
 ### Changed

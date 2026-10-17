@@ -14,9 +14,6 @@ importers:
       express:
         specifier: ^4.19.2
         version: 4.22.2
-      leaflet:
-        specifier: ^1.9.4
-        version: 1.9.4
       multer:
         specifier: ^1.4.5-lts.1
         version: 1.4.5-lts.2
@@ -753,9 +750,6 @@ packages:
 
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
-
-  leaflet@1.9.4:
-    resolution: {integrity: sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==}
 
   lodash@4.18.1:
     resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
@@ -1924,8 +1918,6 @@ snapshots:
 
   isexe@2.0.0:
     optional: true
-
-  leaflet@1.9.4: {}
 
   lodash@4.18.1: {}
 
