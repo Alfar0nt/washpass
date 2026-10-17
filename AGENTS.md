@@ -1,149 +1,108 @@
 # WashPass — Agent Instructions
 
-## Project Status
-**Phase 1-6 Complete** — Phase 1 (Setup), 2 (Backend), 3 (Landing Page), 4 (Order Flow), 5 (Admin), 6 (Utilities) done. Phase 7 (Polish), 8 (Assets) pending.
+Instruksi dan standar kerja autonomous agent di codebase WashPass.
 
-## Tech Stack (from `.ai/tech-stack.md`)
-- **Frontend Build**: Vite (vanilla JS, ES Modules)
+## Project Status
+**Phase 1-6 & 8.2 Selesai** — Phase 7 (Polish/Lighthouse), 8.1 (Brand Assets), 9 (Payment Midtrans) pending. Rujukan roadmap: `.ai/IMPLEMENTATION-PLAN.md`.
+
+## Core Agent Rules & Environment
+
+1. **Browser Testing & Lighthouse (Manjaro Linux)**:
+   - Mesin lokal menggunakan **Brave Browser** (`/bin/brave`).
+   - Gunakan Brave untuk pengujian audit Lighthouse, responsivitas tampilan, dan cross-browser testing.
+   - Contoh command Lighthouse headless / devtools via Brave:
+     ```bash
+     brave --headless --remote-debugging-port=9222 http://localhost:5173
+     # atau npx lighthouse-ci / npx lighthouse http://localhost:5173 --chrome-flags="--headless"
+     ```
+     (Atur binary path Chrome ke `/bin/brave` jika tool mengasumsikan lokasi Google Chrome default: `CHROME_PATH=/bin/brave`).
+
+2. **Komunikasi & Konfirmasi Bebas Halusinasi**:
+   - **Selalu tanyakan dan konfirmasi ke user** setelah menerima prompt jika terdapat instruksi yang ambigu, tidak lengkap, atau memiliki lebih dari satu arah implementasi.
+   - Jangan berasumsi atau membuat kesimpulan sendiri pada requirement yang samar untuk mencegah halusinasi.
+
+## Tech Stack Overview
+- **Frontend Build**: Vite (Vanilla JS, ES Modules)
 - **Backend**: Express.js (Node.js)
-- **Database**: SQLite via `sqlite3` + `sqlite` (async wrapper, Node.js 26 compatible)
+- **Database**: SQLite via `sqlite3` + `sqlite` (async wrapper, Node.js 20+ compatible)
 - **File Upload**: Multer (server-side) + Canvas API compression (client-side)
 - **Maps**: Leaflet.js + OpenStreetMap
 - **Location**: Browser Geolocation API + Nominatim reverse geocoding
-- **Language**: JavaScript ES2022+ (no TypeScript)
-- **CSS**: Vanilla CSS + Custom Properties (design tokens), BEM-inspired + utility hybrid
-- **Fonts**: Plus Jakarta Sans (headings), Inter (body) — Google Fonts
-- **Icons**: Lucide Icons (inline SVG)
-- **Deploy**: Railway / Render / VPS (needs Node.js runtime)
+- **Language**: JavaScript ES2022+ (No TypeScript)
+- **CSS**: Vanilla CSS + Custom Properties (Design Tokens), BEM-inspired
+- **Fonts**: Plus Jakarta Sans (Headings), Inter (Body)
+- **Icons**: Lucide Icons (Inline SVG)
 
-## Project Structure (implemented)
+## Project Structure
 ```
 washpass/
-├── server/                 # Backend
-│   ├── index.js            # Express entry point
+├── server/                 # Express backend
+│   ├── index.js            # Entry point & API routes
 │   ├── db/
 │   │   ├── database.js     # SQLite connection
-│   │   ├── schema.js       # Table creation
-│   │   └── washpass.db     # DB file (auto-created)
+│   │   ├── schema.js       # Auto schema tables
+│   │   └── washpass.db     # SQLite DB file (auto-generated)
 │   ├── routes/
-│   │   └── orders.js       # /api/orders CRUD
+│   │   └── orders.js       # CRUD /api/orders
 │   ├── middleware/
-│   │   └── upload.js       # Multer config
-│   └── uploads/            # Photo files (gitignored)
-├── src/                    # Frontend (Vite)
-│   ├── index.html          # Landing page (✅ complete)
-│   ├── order.html          # Order flow (✅ complete)
-│   ├── admin.html          # Admin order list (✅ complete)
+│   │   └── upload.js       # Multer multipart config
+│   └── uploads/            # Direktori foto order (gitignored)
+├── src/                    # Frontend source (Vite)
+│   ├── index.html          # Landing page
+│   ├── order.html          # Multi-step order flow
+│   ├── admin.html          # Admin management panel
+│   ├── privacy.html        # Kebijakan privasi
+│   ├── terms.html          # Syarat dan ketentuan
 │   ├── css/
 │   │   ├── reset.css
-│   │   ├── variables.css   # Design tokens
+│   │   ├── variables.css   # Single source of truth untuk design tokens
 │   │   ├── global.css
-│   │   ├── components/     # 13 component CSS files
-│   │   └── pages/          # landing.css, order.css, admin.css
+│   │   ├── components/     # CSS modular komponen
+│   │   └── pages/          # CSS per halaman (landing, order, admin, legal)
 │   ├── js/
-│   │   ├── main.js         # Landing entry (✅ renders all sections)
-│   │   ├── order.js        # Order flow entry (✅ complete)
-│   │   ├── admin.js        # Admin page entry (✅ complete)
-│   │   ├── config/pricing.js
-│   │   ├── components/     # 10 JS components
-│   │   ├── services/api.js # HTTP client for backend
-│   │   └── utils/          # 9 utility modules
+│   │   ├── main.js         # Landing page entry point
+│   │   ├── order.js        # Order flow logic
+│   │   ├── admin.js        # Admin page logic
+│   │   ├── config/pricing.js # Source of truth harga & katalog
+│   │   ├── components/     # Reusable UI component modules
+│   │   ├── services/api.js # API client HTTP
+│   │   └── utils/          # Helper modules (cart, formatters, validators, dll.)
 │   └── assets/
-├── public/                 # Vite public assets (exists)
-├── vite.config.js
-├── package.json
-└── .gitignore
+├── public/                 # Static assets (favicon, manifest, og-image)
+├── .ai/                    # Dokumentasi terstruktur proyek
+│   ├── PRD.md              # Product Requirement Document
+│   ├── TRD.md              # Technical Requirements Document
+│   ├── APP-FLOW.md         # Wireframe, Sitemap & User Flow
+│   ├── IMPLEMENTATION-PLAN.md # Roadmap & tracking implementasi
+│   └── DESIGN.md           # Design tokens, komponen UI & styling specs
+├── AGENTS.md               # Pedoman agent (file ini)
+├── README.md               # Dokumentasi umum repo
+└── vite.config.js
 ```
-
-## Key Architectural Decisions
-| Decision | Rationale |
-|----------|-----------|
-| Vanilla JS, no framework | Multi-page site + forms; no complex state management needed |
-| Multi-page (3 HTML) | Landing (SEO), Order (heavy JS), Admin (separate concern) |
-| Express.js + SQLite | Lightweight backend; SQLite = file-based DB, zero-config |
-| `better-sqlite3` | Synchronous API, simpler code, no async/await for DB |
-| Multer for uploads | Standard Express file upload middleware |
-| Cart state in localStorage | Class-based, event-driven; persists across refresh |
-| Photo upload to server | Compress client-side → upload via multipart → stored in uploads/ |
-| WhatsApp integration | `wa.me/{number}?text={encoded}`; triggered AFTER server save |
-| Admin without auth | MVP constraint; admin URL is "secret" |
 
 ## API Endpoints
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| `POST` | `/api/orders` | Submit new order (multipart: customer + items + photos + lat/lng) |
-| `GET` | `/api/orders` | List all orders (admin, filterable by status) |
-| `GET` | `/api/orders/:id` | Order detail (admin) |
-| `PATCH` | `/api/orders/:id/status` | Update order status (pending→picked_up→in_progress→done) |
-| `GET` | `/uploads/:filename` | Serve uploaded photos |
+| Method | Endpoint | Fungsi |
+|---|---|---|
+| `POST` | `/api/orders` | Buat order baru (multipart: data + items + foto + GPS) |
+| `GET` | `/api/orders` | Ambil daftar semua order (support `?status=`) |
+| `GET` | `/api/orders/:id` | Ambil detail spesifik order |
+| `PATCH` | `/api/orders/:id/status` | Update status (`pending` → `picked_up` → `in_progress` → `done`) |
+| `GET` | `/uploads/:filename` | Sajikan foto sepatu yang diunggah |
 
-## Database Tables
-- `orders` — customer info, totals, **latitude, longitude**, status (pending/picked_up/in_progress/done), timestamps
-- `order_items` — category, material, wash type, price per item, notes
-- `order_photos` — filename, original name, linked to order_item
-
-## Business Rules (from `.ai/PRD.md`)
-- **Minimum order**: 2 pairs (shoes + sandals combinable)
-- **Shoe materials**: canvas, mesh-knit, leather, suede-nubuck, rubber-eva
-- **Wash types**: fast-clean (dry), deep-clean (wet)
-- **Sandal pricing**: flat rate regardless of material
-- **Order flow**: Submit to server → WhatsApp redirect
-- **Admin**: Can view orders + update status (pending/picked_up/in_progress/done)
-- **Location sharing**: Optional GPS via browser Geolocation API, shown on Leaflet map in admin
-
-## Implementation Phases (from `.ai/tasks.md`)
-1. **Setup** ✅ — Vite init, Express init, folder structure, CSS tokens (~30 min)
-2. **Backend** ✅ — SQLite schema, Express routes, Multer upload, API CRUD (~2-3 hr)
-3. **Landing Page** ✅ — 7 sections: Navbar, Hero, How It Works, Why Us, Price Table, FAQ, Footer (~2-3 hr)
-4. **Order Flow** ✅ — 7 steps with step indicator, validation, cart, GPS location, API submit (~3-4 hr)
-5. **Admin Page** ✅ — Order list table, order detail modal with map, status dropdown with validation (~2-3 hr)
-6. **Utilities** ✅ — pricing config, cart class, step manager, image compressor, validators, formatters, WA generator, API client, location, map, status (~1-2 hr)
-7. **Polish** ⏳ — animations, accessibility, Lighthouse, cross-browser (~1-2 hr)
-8. **Assets** ⏳ — logo, illustrations, icons, content (~1 hr)
-
-## Commands
+## Development Commands
 ```bash
-# After package.json exists:
-npm run dev          # Vite dev server (frontend, port 5173)
-npm run dev:server   # Express dev server (backend, port 3000)
-npm run dev:all      # Both concurrently
-npm run build        # Production build (Vite)
-npm run start        # Production server (Express serves dist/ + API)
+pnpm install         # Install dependencies
+pnpm run dev:all     # Jalankan frontend (Vite :5173) & backend (Express :3000) bersamaan
+pnpm run dev         # Frontend saja
+pnpm run dev:server  # Backend Express saja
+pnpm run build       # Build bundle frontend ke folder dist/
+pnpm run start       # Jalankan server Express production (melayani API + dist/)
+pnpm run clean:ports # Bersihkan port 3000 & 5173 jika hang/bentrok
 ```
 
-## Dev Architecture
-```
-Development:
-  Vite (port 5173) ──proxy──► Express (port 3000)
-    /api/*          →           /api/*
-    /uploads/*      →           /uploads/*
-
-Production:
-  Express (port 3000)
-    /api/*          →  API routes
-    /uploads/*      →  Static files
-    /*              →  Vite dist/ (static frontend)
-```
-
-## Files to Reference
-- `.ai/tech-stack.md` — Full tech decisions, design tokens, project structure, implementation status
-- `.ai/PRD.md` — Product requirements, user flows, pricing matrix, WA message template, DB schema, admin spec
-- `.ai/ux-flow.md` — Wireframes, interaction specs, validation rules, edge cases
-- `.ai/tasks.md` — Detailed task breakdown with checkboxes (updated with current status)
-
-## Gotchas for Agents
-- **Landing page** — Now fully implemented with all 7 sections
-- **Design tokens defined in tech-stack.md** — Use those exact CSS custom properties
-- **Pricing is single-source** — All prices in `src/js/config/pricing.js` only
-- **WhatsApp number** — Hardcoded in config, easy to change
-- **Cart persists in localStorage** — Survives refresh (was MVP constraint, now fixed)
-- **Mobile-first** — Breakpoints: <768px, 768-1024px, >1024px
-- **SQLite DB auto-created** — Schema runs on server start, no migration needed
-- **uploads/ is gitignored** — Photos stored on server filesystem only
-- **Admin has no auth** — Anyone with the URL can access (MVP)
-- **Order submit is dual** — Save to SQLite + redirect to WhatsApp
-- **Photo compression integrated** — Canvas API compression in photo uploader
-- **`public/` directory** — Exists (required by Vite config)
-- **Order flow steps inline** — Steps rendered directly in `order.js` instead of modular components
-- **Order page blank page fixed** — Added missing `stepContent` container in `order.js` init()
-- **Landing page mobile navbar fixed** — Dynamic height offset using ResizeObserver + body paddingTop
+## Referensi Dokumentasi
+- `.ai/PRD.md` — Deskripsi produk & fungsional
+- `.ai/TRD.md` — Detail teknis arsitektur, API contract & skema DB
+- `.ai/APP-FLOW.md` — Alur kerja aplikasi, sitemap, wireframe & edge cases
+- `.ai/IMPLEMENTATION-PLAN.md` — Task list & riwayat implementasi
+- `.ai/DESIGN.md` — Design system, palet warna, tipografi & token

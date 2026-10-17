@@ -8,7 +8,14 @@ Website jasa cuci sepatu & sandal profesional dengan sistem pickup & delivery.
 
 See [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) for version history and changelog.
 
-See [`.ai/tasks.md`](./.ai/tasks.md) for detailed feature documentation, known issues, and action items.
+See [`.ai/IMPLEMENTATION-PLAN.md`](./.ai/IMPLEMENTATION-PLAN.md) for detailed feature documentation, known issues, and action items.
+
+Dokumentasi arsitektur dan spesifikasi teknis:
+- [`.ai/APP-FLOW.md`](./.ai/APP-FLOW.md) — Alur pengguna, wireframe & sitemap
+- [`.ai/TRD.md`](./.ai/TRD.md) — Technical requirements & API specification
+- [`.ai/DESIGN.md`](./.ai/DESIGN.md) — Design system & UI tokens
+- [`.ai/PRD.md`](./.ai/PRD.md) — Product requirement document
+- [`AGENTS.md`](./AGENTS.md) — Panduan agen AI & standar testing Brave browser
 
 ## Screenshots
 
