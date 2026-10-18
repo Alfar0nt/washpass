@@ -18,6 +18,7 @@ export default defineConfig({
         admin: path.resolve(__dirname, 'src/admin.html'),
         privacy: path.resolve(__dirname, 'src/privacy.html'),
         terms: path.resolve(__dirname, 'src/terms.html'),
+        track: path.resolve(__dirname, 'src/track.html'),
       },
     },
   },
@@ -46,6 +47,7 @@ export default defineConfig({
             '/admin': '/admin.html',
             '/privacy': '/privacy.html',
             '/terms': '/terms.html',
+            '/track': '/track.html',
           };
           if (clean[req.url]) {
             req.url = clean[req.url];

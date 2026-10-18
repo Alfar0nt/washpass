@@ -1,3 +1,6 @@
+import { getWhatsAppNumber } from '../utils/whatsapp.js';
+import { formatWhatsAppForDisplay } from '../utils/validators.js';
+
 export class Footer {
   constructor(container, options = {}) {
     this.container = container;
@@ -5,6 +8,10 @@ export class Footer {
   }
 
   render() {
+    const waNumber = getWhatsAppNumber();
+    const waLink = `https://wa.me/${waNumber}`;
+    const waDisplay = formatWhatsAppForDisplay(waNumber);
+
     this.container.innerHTML = `
       <footer class="footer" role="contentinfo">
         <div class="container">
@@ -21,7 +28,7 @@ export class Footer {
               </div>
               <p class="footer__description">Layanan cuci sepatu & sandal profesional dengan sistem pickup & delivery gratis. Sepatu bersih, tinggal duduk manis.</p>
               <div class="footer__social">
-                <a href="https://wa.me/6281234567890" target="_blank" rel="noopener" class="footer__social-link" aria-label="WhatsApp">
+                <a href="${waLink}" target="_blank" rel="noopener" class="footer__social-link" aria-label="WhatsApp">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
                   </svg>
@@ -40,6 +47,7 @@ export class Footer {
               <ul class="footer__links">
                 <li><a href="/" class="footer__link">Beranda</a></li>
                 <li><a href="/order" class="footer__link">Pesan Sekarang</a></li>
+                <li><a href="/track" class="footer__link">Lacak Pesanan</a></li>
                 <li><a href="#pricing" class="footer__link">Harga</a></li>
                 <li><a href="#how-it-works" class="footer__link">Cara Kerja</a></li>
                 <li><a href="#faq" class="footer__link">FAQ</a></li>
@@ -63,13 +71,13 @@ export class Footer {
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                     <circle cx="12" cy="10" r="3" />
                   </svg>
-                  <span>Jl. Contoh No. 123, Kelurahan Contoh, Kecamatan Contoh, Kota Depok</span>
+                  <span>Area layanan: Depok, Jakarta Selatan &amp; Jakarta Barat</span>
                 </li>
                 <li class="footer__contact-item">
                   <svg class="footer__contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                   </svg>
-                  <a href="https://wa.me/6281234567890" class="footer__link">0812-3456-7890</a>
+                  <a href="${waLink}" class="footer__link">${waDisplay}</a>
                 </li>
                 <li class="footer__contact-item">
                   <svg class="footer__contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">

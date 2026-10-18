@@ -66,6 +66,7 @@ if (NODE_ENV === 'production') {
     '/admin': 'admin.html',
     '/privacy': 'privacy.html',
     '/terms': 'terms.html',
+    '/track': 'track.html',
   };
 
   Object.entries(staticPages).forEach(([route, file]) => {

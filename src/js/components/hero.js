@@ -35,26 +35,41 @@ export class Hero {
             <div class="hero__visual hero-stagger-4">
               <div class="hero__card">
                 <div class="hero__card-header">
-                  <div class="hero__card-avatar">SR</div>
+                  <div class="hero__card-avatar" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                      <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                  </div>
                   <div class="hero__card-info">
-                    <h4>Sarah Putri</h4>
-                    <p>Verified Customer • Jakarta</p>
+                    <h4>Semudah 3 Langkah</h4>
+                    <p>Tanpa repot keluar rumah</p>
                   </div>
                 </div>
-                <div class="hero__stats">
-                  <div class="hero__stat">
-                    <div class="hero__stat-number">2.500+</div>
-                    <div class="hero__stat-label">Pasang Bersih</div>
-                  </div>
-                  <div class="hero__stat">
-                    <div class="hero__stat-number">24 Jam</div>
-                    <div class="hero__stat-label">Fast Clean</div>
-                  </div>
-                  <div class="hero__stat">
-                    <div class="hero__stat-number">4.9/5</div>
-                    <div class="hero__stat-label">Rating Pelanggan</div>
-                  </div>
-                </div>
+                <ol class="hero__steps">
+                  <li class="hero__step">
+                    <span class="hero__step-num">1</span>
+                    <div>
+                      <h5>Pesan &amp; Jemput</h5>
+                      <p>Booking online, kurir menjemput di depan pintu</p>
+                    </div>
+                  </li>
+                  <li class="hero__step">
+                    <span class="hero__step-num">2</span>
+                    <div>
+                      <h5>Dicuci Sesuai Bahan</h5>
+                      <p>Perawatan khusus kulit, suede, canvas, hingga sandal</p>
+                    </div>
+                  </li>
+                  <li class="hero__step">
+                    <span class="hero__step-num">3</span>
+                    <div>
+                      <h5>Diantar Kembali</h5>
+                      <p>Sepatu bersih, wangi, dan siap dipakai lagi</p>
+                    </div>
+                  </li>
+                </ol>
+                <a href="/track" class="hero__card-link">Sudah pesan? Lacak status pesanan</a>
               </div>
             </div>
           </div>

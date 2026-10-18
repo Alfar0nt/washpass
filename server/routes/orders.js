@@ -223,6 +223,35 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Public tracking endpoint: limited fields, no PII (name/WA/address/GPS)
+router.get('/track/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!/^\d+$/.test(id)) {
+      return res.status(404).json({ error: 'Pesanan tidak ditemukan' });
+    }
+    const db = await getDatabase();
+
+    const order = await db.get(
+      'SELECT id, status, total_price, total_items, created_at, updated_at FROM orders WHERE id = ?',
+      id
+    );
+    if (!order) {
+      return res.status(404).json({ error: 'Pesanan tidak ditemukan' });
+    }
+
+    const items = await db.all(
+      'SELECT category, material, wash_type, price FROM order_items WHERE order_id = ?',
+      id
+    );
+
+    res.json({ ...order, items });
+  } catch (error) {
+    console.error('Error tracking order:', error);
+    res.status(500).json({ error: 'Gagal mengambil status pesanan' });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;

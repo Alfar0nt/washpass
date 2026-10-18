@@ -57,6 +57,10 @@ export async function getOrderDetail(id) {
   return request(`/orders/${id}`);
 }
 
+export async function trackOrder(id) {
+  return request(`/orders/track/${id}`);
+}
+
 export async function updateOrderStatus(id, status) {
   return request(`/orders/${id}/status`, {
     method: 'PATCH',

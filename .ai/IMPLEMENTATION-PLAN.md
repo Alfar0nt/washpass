@@ -21,12 +21,14 @@ Diperbarui: 2026-10-18 — hasil audit menyeluruh codebase dari perspektif custo
 
 > **Keputusan (2026-10-18)**: admin **TANPA autentikasi** untuk MVP. Risiko `PATCH /api/orders/:id/status` terbuka dicatat sebagai *accepted risk* (mitigasi: ID order tidak diprediksi mudah, halaman `/admin` noindex). Auth ditunda ke iterasi setelah launch.
 
-### P1 — Customer: Janji Produk yang Hilang
-- [ ] **Halaman `/track`**: customer input order ID → tampilkan status, timeline status, ringkasan items (label, qty), total harga, tanggal order. Tanpa data sensitif berlebihan (tanpa alamat lengkap / GPS).
-- [ ] **Endpoint `GET /api/orders/track/:id`** (public): field terbatas — `status`, items label, `total_price`, `total_items`, `created_at`, `updated_at`. 404 jika tidak ada.
-- [ ] **Ganti placeholder**: nomor WA bisnis & alamat footer — generate placeholder konsisten brand sementara (siap ganti nyata kapan saja).
-- [ ] **Hapus testimoni "Sarah Putri"** dari hero (`src/js/components/hero.js` + CSS terkait) — social proof palsu.
+### P1 — Customer: Janji Produk yang Hilang ✅ Selesai (2026-10-18)
+- [x] **Halaman `/track`**: `src/track.html` + `src/js/track.js` + `src/css/pages/track.css` — input order ID → status badge, deskripsi, timeline 4 tahap, rincian item, total, tanggal dibuat & diperbarui. Terdaftar di Vite MPA + clean-URL dev/prod. Link "Lacak Pesanan" ditambahkan di footer.
+- [x] **Endpoint `GET /api/orders/track/:id`** (public): field terbatas — `status`, items (`category`/`material`/`wash_type`/`price`), `total_price`, `total_items`, `created_at`, `updated_at`. 404 `Pesanan tidak ditemukan` untuk id invalid/tidak ada. Tanpa PII (nama/WA/alamat/GPS tidak diikutkan).
+- [x] **Ganti placeholder**: nomor WA footer kini dari satu sumber (`getWhatsAppNumber()` → env `VITE_WHATSAPP_NUMBER`), alamat footer jadi "Area layanan: Depok, Jakarta Selatan & Jakarta Barat".
+- [x] **Hapus testimoni "Sarah Putri"** dari hero — diganti kartu jujur "Semudah 3 Langkah" + tautan lacak pesanan (tanpa angka/rating fiktif).
 Skill: `ui-ux-pro-max` (desain halaman /track), `brand` (copy placeholder).
+
+> Catatan accepted risk: order ID bersifat sekuensial → endpoint tracking dapat dienumerasi (hanya status/items/harga, tanpa PII). Mitigasi tambahan (verifikasi nomor WA) dapat ditambahkan bila diperlukan.
 
 ### P2 — Admin Operations ( hasil audit perspektif admin)
 - [ ] **Pencarian** input teks di atas tabel: filter by nama / WhatsApp / order ID (client-side pada data yang sudah dimuat).
