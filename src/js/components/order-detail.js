@@ -175,7 +175,7 @@ export class OrderDetail {
               <span>${latitude.toFixed(6)}, ${longitude.toFixed(6)}</span>
             </div>
             <div class="admin-detail__map" id="detailMap" style="height: 300px; border-radius: var(--radius-lg); overflow: hidden;"></div>
-            <button type="button" class="btn btn-outline btn-sm" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}', '_blank')">
+            <button type="button" class="btn btn-outline btn-sm" id="openMapsBtn" data-lat="${latitude}" data-lng="${longitude}">
               <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polygon points="3 11 22 2 13 21 11 13 3 11" />
               </svg>
@@ -324,6 +324,16 @@ export class OrderDetail {
     const cancelBtn = this.content.querySelector('#cancelOrderBtn');
     if (cancelBtn) {
       cancelBtn.addEventListener('click', () => this.updateStatus(ORDER_STATUSES.CANCELLED));
+    }
+
+    const mapsBtn = this.content.querySelector('#openMapsBtn');
+    if (mapsBtn) {
+      mapsBtn.addEventListener('click', () => {
+        window.open(
+          `https://www.google.com/maps/search/?api=1&query=${mapsBtn.dataset.lat},${mapsBtn.dataset.lng}`,
+          '_blank'
+        );
+      });
     }
 
     // Bind photo click events for modal viewer

@@ -102,8 +102,10 @@ pnpm run build        # hasil: dist/
 ```
 
 - Build command: `pnpm run build` — Output directory: `dist`
-- Pages otomatis menyajikan `/order` dari `order.html` (dan seterusnya) + `404.html` sebagai fallback.
-- Sebelum live publik: ganti domain placeholder di `public/sitemap.xml` & `public/robots.txt`.
+- **Production branch: `demo`** — set di Cloudflare Dashboard → Workers & Pages → project → Settings → Builds & deployments → *Production branch*. Setelah diubah, setiap push ke `demo` memicu deploy produksi otomatis.
+- Pages otomatis menyajikan `/order` dari `order.html` (dan seterusnya) + `404.html` sebagai fallback — tidak perlu `_redirects`.
+- Header keamanan (CSP, X-Frame-Options, dll.) diatur lewat `public/_headers` (pengganti helmet di mode statis).
+- Domain: `https://demo-washpass.dhiarharianto.work` (sudah di `public/sitemap.xml` & `public/robots.txt`).
 - `VITE_WHATSAPP_MOCK` default `true` (demo); set `false` + isi `VITE_WHATSAPP_NUMBER` bila ingin redirect `wa.me` nyata.
 
 ## Next Steps

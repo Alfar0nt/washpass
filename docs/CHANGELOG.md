@@ -14,6 +14,8 @@ Branch `demo` — versi live demo statis untuk Cloudflare Pages (tanpa backend/d
 - **Test mock API** (`src/js/services/api.test.js`, 9 test): seed, sanitasi track (tanpa PII), transisi status, stats, submit, validasi WhatsApp, reset.
 
 ### Changed
+- **Header keamanan statis** (`public/_headers`): CSP, X-Frame-Options, Referrer-Policy, Permissions-Policy — parity dengan `helmet` yang tidak aktif di mode statis.
+- **Domain demo** `demo-washpass.dhiarharianto.work` di `public/sitemap.xml` & `public/robots.txt`; production branch Cloudflare Pages diset ke `demo`.
 - **WhatsApp mock default**: `VITE_WHATSAPP_MOCK` kini default `true` di branch demo (redirect `wa.me` hanya jika `VITE_WHATSAPP_MOCK=false` eksplisit).
 - **Backend `server/` tidak di-deploy**: tetap di repo untuk referensi/full-stack asli; Cloudflare Pages hanya melayani hasil `pnpm run build` (`dist/`).
 
