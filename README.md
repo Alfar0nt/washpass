@@ -4,7 +4,7 @@ Website jasa cuci sepatu & sandal profesional dengan sistem pickup & delivery.
 
 ## Status
 
-**Phase 1-6 Complete** | **Phase 7-8.2 Pending**
+**Phase 1-6 & 8.2 Complete** | **Phase 7, 8.1, 9 Pending**
 
 See [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) for version history and changelog.
 
@@ -83,7 +83,9 @@ pnpm run start
 
 ## Next Steps
 
-1. **Phase 7**: Polish (animations, accessibility, SEO, Lighthouse audit)
-2. **Phase 8**: Assets (logo, illustrations, OG image, favicon, web manifest)
-3. **Phase 9**: Payment Gateway — Midtrans Snap (QRIS, e-wallet, bank transfer)
+1. **Phase 7**: Polish (accessibility, Lighthouse audit, cross-browser & responsive)
+2. **Phase 8.1**: Assets (logo, illustrations, material & step iconography)
+3. **Phase 9**: Payment Gateway — Midtrans Snap (QRIS, e-wallet, bank transfer) — *ditunda sampai MVP launch*
 4. **Production deployment** — Build & deploy to Railway/Render/VPS
+
+Lihat [`.ai/IMPLEMENTATION-PLAN.md`](./.ai/IMPLEMENTATION-PLAN.md) untuk prioritas terkini (P0–P7).

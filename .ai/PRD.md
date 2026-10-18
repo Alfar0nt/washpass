@@ -248,19 +248,20 @@
 ### Nama Brand: **WashPass**
 ### Tagline: *"Sepatu Bersih, Tinggal Duduk Manis"*
 
-### Palet Warna (Rencana)
+### Palet Warna (Implementasi — lihat `src/css/variables.css`)
 | Peran | Warna | Hex |
 |-------|-------|-----|
-| Primary | Deep Teal / Biru Kehijauan | `#0D9488` |
-| Primary Dark | Teal Gelap | `#0F766E` |
-| Secondary / Accent | Amber / Kuning Hangat | `#F59E0B` |
-| Background | Off-White Hangat | `#FAFAF9` |
+| Primary | Clean Modern Aqua | `#0284C7` |
+| Primary Dark | Sky Dark | `#0369A1` |
+| Primary Light | Sky Light | `#38BDF8` |
+| Secondary / Accent | Warm Amber | `#F59E0B` |
+| Background | Crisp Slate Canvas | `#F8FAFC` |
 | Surface / Card | Putih | `#FFFFFF` |
-| Text Primary | Hampir Hitam | `#1C1917` |
-| Text Secondary | Abu-abu | `#78716C` |
-| Success | Hijau | `#22C55E` |
-| Error | Merah | `#EF4444` |
-| Gradient Hero | Teal ke Deep Blue | `#0D9488 → #1E3A5F` |
+| Text Primary | Dark Slate | `#0F172A` |
+| Text Secondary | Slate | `#475569` |
+| Success | Emerald | `#10B981` |
+| Error | Red | `#EF4444` |
+| Gradient Hero | Aqua ke Sky Dark | `#38BDF8 → #0284C7` |
 
 ### Tipografi
 - **Heading:** Plus Jakarta Sans (Google Fonts) — modern, clean, Indonesia-friendly
@@ -321,7 +322,7 @@ Terima kasih telah memesan di WashPass! 🙏
 
 ### 8.1 Arsitektur
 - **Runtime:** Node.js + Express.js
-- **Database:** SQLite (via `better-sqlite3`) — file-based, zero-config, sangat ringan
+- **Database:** SQLite (via `sqlite3` + `sqlite` async wrapper) — file-based, zero-config, sangat ringan
 - **File Storage:** Foto disimpan sebagai file di folder `uploads/` di server
 - **Arsitektur:** Monorepo — frontend (Vite) dan backend (Express) dalam satu project
 
@@ -467,7 +468,7 @@ Untuk versi pertama ini, berikut yang **TERMASUK** dan **TIDAK TERMASUK**:
 | User tidak memenuhi minimal order | Frustrasi | UX yang jelas menginformasikan syarat minimal dari awal |
 | Harga berubah | Ketidaksesuaian | Harga disimpan di 1 file konfigurasi, mudah diubah |
 | Admin page tanpa auth | Siapa saja bisa lihat order | Untuk MVP acceptable; tambahkan basic auth di iterasi berikutnya |
-| SQLite concurrency | Write lock saat banyak order | `better-sqlite3` synchronous, cukup untuk volume kecil |
+| SQLite concurrency | Write lock saat banyak order | `sqlite3` + WAL mode, cukup untuk volume kecil |
 | Server down | Order tidak tersimpan | WA redirect tetap jalan (client-side), order bisa di-input manual |
 | User tolak izin lokasi / GPS tidak akurat | Admin tidak tahu lokasi pasti | Alamat tertulis tetap wajib, lokasi GPS opsional sebagai tambahan |
 | Browser tidak support Geolocation API | Tidak bisa share lokasi | Fallback ke input manual alamat, graceful degradation |

@@ -3,7 +3,7 @@
 Instruksi dan standar kerja autonomous agent di codebase WashPass.
 
 ## Project Status
-**Phase 1-6 & 8.2 Selesai** — Phase 7 (Polish/Lighthouse), 8.1 (Brand Assets), 9 (Payment Midtrans) pending. Rujukan roadmap: `.ai/IMPLEMENTATION-PLAN.md`.
+**Phase 1-6 & 8.2 Selesai** — Phase 7 (Polish/Lighthouse), 8.1 (Brand Assets), 9 (Payment Midtrans) pending. Roadmap kini diprioritaskan P0–P7 (audit customer + admin). Rujukan: `.ai/IMPLEMENTATION-PLAN.md`.
 
 ## Core Agent Rules & Environment
 

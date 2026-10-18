@@ -1,11 +1,13 @@
 import { formatCurrency } from './formatters.js';
 
-let WHATSAPP_NUMBER = '6281234567890'; // Ganti dengan nomor WA bisnis
+// Configure via .env: VITE_WHATSAPP_NUMBER, VITE_WHATSAPP_MOCK
+let WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '6281234567890';
 
-// Mock mode: when true, the WhatsApp step sends a placeholder message (wa.me link)
-// and never blocks order confirmation. Set to false when integrating a real
-// WhatsApp API for production.
-let WHATSAPP_MOCK = true;
+// Mock mode: when true, the WhatsApp step never blocks order confirmation.
+// Default: true in dev, false in production (unless VITE_WHATSAPP_MOCK=true).
+let WHATSAPP_MOCK = import.meta.env.DEV
+  ? import.meta.env.VITE_WHATSAPP_MOCK !== 'false'
+  : import.meta.env.VITE_WHATSAPP_MOCK === 'true';
 
 export function getWhatsAppNumber() {
   return WHATSAPP_NUMBER;

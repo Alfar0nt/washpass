@@ -52,24 +52,25 @@ graph LR
 ### `orders`
 | Kolom | Tipe | Constraint | Deskripsi |
 |---|---|---|---|
-| `id` | TEXT | PRIMARY KEY | Format: UUID v4 |
+| `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | ID order |
 | `customer_name` | TEXT | NOT NULL | Nama pemesan |
 | `whatsapp` | TEXT | NOT NULL | Nomor kontak WhatsApp |
 | `address` | TEXT | NOT NULL | Alamat penjemputan |
-| `notes` | TEXT | NULL | Catatan patokan/lokasi |
+| `address_note` | TEXT | NULL | Catatan patokan/lokasi |
 | `latitude` | REAL | NULL | Titik lintang GPS browser |
 | `longitude` | REAL | NULL | Titik bujur GPS browser |
 | `status` | TEXT | NOT NULL DEFAULT 'pending' | Enum: `pending`, `picked_up`, `in_progress`, `done` |
 | `total_price` | INTEGER | NOT NULL | Total tagihan rupiah |
-| `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Waktu order dibuat |
-| `updated_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Terakhir diupdate |
+| `total_items` | INTEGER | NOT NULL | Jumlah pasang |
+| `created_at` | TEXT | DEFAULT `datetime('now','localtime')` | Waktu order dibuat |
+| `updated_at` | TEXT | DEFAULT `datetime('now','localtime')` | Terakhir diupdate |
 
 ### `order_items`
 | Kolom | Tipe | Constraint | Deskripsi |
 |---|---|---|---|
-| `id` | TEXT | PRIMARY KEY | UUID v4 |
-| `order_id` | TEXT | NOT NULL, FK(`orders.id`) | Relasi pesanan induk |
-| `category` | TEXT | NOT NULL | `sepatu` atau `sandal` |
+| `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | ID item |
+| `order_id` | INTEGER | NOT NULL, FK(`orders.id`) | Relasi pesanan induk |
+| `category` | TEXT | NOT NULL | `shoe` atau `sandal` |
 | `material` | TEXT | NULL | Jenis bahan sepatu |
 | `wash_type` | TEXT | NOT NULL | `fast-clean` atau `deep-clean` |
 | `price` | INTEGER | NOT NULL | Harga per pasang |
@@ -78,26 +79,28 @@ graph LR
 ### `order_photos`
 | Kolom | Tipe | Constraint | Deskripsi |
 |---|---|---|---|
-| `id` | TEXT | PRIMARY KEY | UUID v4 |
-| `order_item_id` | TEXT | NOT NULL, FK(`order_items.id`)| Relasi item sepatu |
+| `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | ID foto |
+| `order_item_id` | INTEGER | NOT NULL, FK(`order_items.id`)| Relasi item sepatu |
 | `filename` | TEXT | NOT NULL | Nama file di folder `uploads/` |
 | `original_name`| TEXT | NOT NULL | Nama file asli dari user |
+| `size_bytes` | INTEGER | NULL | Ukuran file dalam byte |
+| `created_at` | TEXT | DEFAULT `datetime('now','localtime')` | Waktu upload |
 
 ## 4. API Endpoints Contract
 
 ### 4.1 Orders API
 - `POST /api/orders`
   - Content-Type: `multipart/form-data`
-  - Fields: `customer_name`, `whatsapp`, `address`, `notes`, `latitude`, `longitude`, `items` (JSON stringified), `photos` (binary files).
-  - Response: `{ status: "success", orderId: "<UUID>" }`
+  - Fields: `customer_name`, `whatsapp`, `address`, `address_note`, `latitude`, `longitude`, `total_price`, `total_items`, `items` (JSON stringified), `photos` (binary files).
+  - Response: `{ orderId: <number>, status: "success" }`
 - `GET /api/orders`
   - Query: `?status=<status>`
   - Response: Array ringkasan order urut tanggal terbaru.
 - `GET /api/orders/:id`
   - Response: Detail pesanan lengkap termasuk array items dan tautan foto.
 - `PATCH /api/orders/:id/status`
-  - Body: `{ "status": "picked_up" | "in_progress" | "done" }`
-  - Response: `{ status: "success", updated: true }`
+  - Body: `{ "status": "picked_up" | "in_progress" | "done" }` (transisi maju saja: pending→picked_up→in_progress→done)
+  - Response: `{ success: true, status: "<status>" }`
 
 ### 4.2 Static Assets
 - `GET /uploads/:filename` -> File gambar foto pesanan.

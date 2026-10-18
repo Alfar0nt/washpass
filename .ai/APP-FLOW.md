@@ -61,7 +61,7 @@ stateDiagram-v2
 Container dinamis single container dengan step progress indicator bar di bagian atas:
 1. **Pilih Kategori**: 👟 Sepatu atau 🩴 Sandal.
 2. **Pilih Bahan** (Bypass jika Sandal): Kanvas, Mesh/Knit, Kulit, Suede/Nubuck, Rubber/EVA.
-3. **Pilih Tipe Cuci**: Fast Clean (kering, 1 hari) vs Deep Clean (basah, 2-3 hari).
+3. **Pilih Tipe Cuci**: Fast Clean (kering, 1–2 hari) vs Deep Clean (basah, 3–5 hari).
 4. **Upload Foto**: Multi-file dropzone dengan kompresi client-side (Canvas API) sebelum payload dikirim.
 5. **Review Keranjang**: Validasi total item $\ge 2$. Kemampuan tambah pasang lain atau edit/hapus item.
 6. **Form Data Diri**:
