@@ -27,18 +27,19 @@
 
 .admin-filter {
   padding: var(--space-2) var(--space-4);
-  border: 2px solid var(--color-border);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   font-size: var(--text-sm);
   background: var(--color-surface);
   color: var(--color-text);
   min-width: 180px;
+  min-height: 40px;
 }
 
 .admin-filter:focus {
   border-color: var(--color-primary);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18);
 }
 
 .admin-order-list__content {

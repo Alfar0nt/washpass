@@ -1,6 +1,6 @@
 # WashPass — Design System & UI Tokens (DESIGN.md)
 
-Dokumentasi spesifikasi desain, token CSS, tipografi, komponen interaktif, dan pedoman UI visual yang saat ini terimplementasi di WashPass.
+Spesifikasi sistem desain, token CSS, tipografi, komponen interaktif, palet warna, dan standar gerak (motion) WashPass. Diperbarui mengacu pada prinsip *Modern Clean & Crisp Aqua* serta *Emil Kowalski Motion Physics*.
 
 ## 1. Color Palette (Tokens)
 
@@ -8,33 +8,38 @@ Implementasi aktif pada `src/css/variables.css`:
 
 ```css
 :root {
-  /* Brand Primary (Teal) */
-  --color-primary: #0D9488;         /* Primary brand color, CTA button, active elements */
-  --color-primary-dark: #0F766E;    /* Hover state button primary, dark accent */
-  --color-primary-light: #14B8A6;   /* Active border, subtle highlight */
+  /* Brand Primary (Clean Modern Aqua & Sky) */
+  --color-primary: #0284C7;         /* Primary brand color, CTA button, focus indicators */
+  --color-primary-dark: #0369A1;    /* Hover state button primary, dark accents */
+  --color-primary-light: #38BDF8;   /* Active border, ring focus, subtle highlights */
+  --color-primary-tint: #E0F2FE;    /* Soft wash badge & selected card backgrounds */
 
-  /* Accent (Amber/Gold) */
-  --color-accent: #F59E0B;          /* Rating stars, badge highlight */
-  --color-accent-dark: #D97706;     /* Accent hover */
+  /* Accent (Warm Amber / Trust Gold) */
+  --color-accent: #F59E0B;          /* Rating stars, highlight tags, promo banners */
+  --color-accent-dark: #D97706;     /* Accent hover & active state */
+  --color-accent-light: #FEF3C7;    /* Accent background tint */
 
-  /* Neutral & Surfaces */
-  --color-bg: #FAFAF9;              /* App background (soft warm gray) */
-  --color-surface: #FFFFFF;         /* Card background, dialog modal */
-  --color-text: #1C1917;            /* Headings & primary body copy */
-  --color-text-secondary: #78716C;  /* Subtitles, labels, secondary info */
-  --color-text-muted: #A8A29E;      /* Placeholder text, disabled hints */
-  --color-border: #E7E5E4;          /* Card borders, table dividers */
+  /* Neutral & Surfaces (Crisp Clean Slate) */
+  --color-bg: #F8FAFC;              /* App background (cool clean slate white) */
+  --color-surface: #FFFFFF;         /* Card background, dialog modal, inputs */
+  --color-text: #0F172A;            /* Headings & primary body copy (WCAG AAA contrast) */
+  --color-text-secondary: #475569;  /* Subtitles, labels, descriptions */
+  --color-text-muted: #94A3B8;      /* Placeholder text, hints, inactive icons */
+  --color-border: #E2E8F0;          /* Card borders, structural dividers */
+  --color-border-subtle: #F1F5F9;   /* Subtle inner separators */
 
-  /* Status Colors */
-  --color-success: #22C55E;         /* Order done, valid input */
+  /* Feedback & Status */
+  --color-success: #10B981;         /* Order done, valid input check */
+  --color-success-tint: #ECFDF5;
   --color-error: #EF4444;           /* Validation error, danger buttons */
+  --color-error-tint: #FEF2F2;
 }
 ```
 
 ## 2. Typography Scale
 
-- **Heading Font**: `'Plus Jakarta Sans', sans-serif` (Google Fonts, weights: 600, 700, 800)
-- **Body Font**: `'Inter', sans-serif` (Google Fonts, weights: 400, 500, 600)
+- **Heading Font**: `'Plus Jakarta Sans', sans-serif` (Weights: 600, 700, 800)
+- **Body Font**: `'Inter', sans-serif` (Weights: 400, 500, 600)
 
 | Token | Ukuran | Penggunaan |
 |---|---|---|
@@ -57,31 +62,44 @@ Implementasi aktif pada `src/css/variables.css`:
   - `--radius-md` (8px): Form input fields, buttons.
   - `--radius-lg` (12px): Standard cards & tables.
   - `--radius-xl` (16px): Featured cards & modals.
-  - `--radius-2xl` (24px): Prominent hero containers.
+  - `--radius-2xl` (24px): Prominent hero containers & bottom sheets.
   - `--radius-full` (9999px): Pill badges & circular icons.
 
 ## 4. Elevation & Shadows
 
 ```css
---shadow-sm: 0 1px 2px rgba(0,0,0,0.05);          /* Subtle separation */
---shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);      /* Card elevation */
---shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);    /* Modals & floating action */
---shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);    /* High elevation elements */
+--shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+--shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+--shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
+--shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
 ```
 
-## 5. UI Components & Interaction Patterns
+## 5. Motion & Physics Tokens
 
-- **Buttons**:
-  - `.btn-primary`: Background `--color-primary`, text white, hover `--color-primary-dark`, active scale `0.98`.
-  - `.btn-secondary`: Light surface border with dark text.
-  - `.btn-outline`: Transparent background with border `--color-primary`.
-  - `.btn-ghost`: Subtle hover effect without border.
-  - Touch target minimal: $44 \times 44\text{ px}$.
+Mengikuti standar `animate` (Emil Kowalski animation philosophy):
+- Asymmetric timing: Exit selalu lebih cepat daripada Entrance.
+- Easing: `--ease-out` untuk masuk (`cubic-bezier(0.16, 1, 0.3, 1)`), `--ease-in-out` untuk morph/state shift.
+- Wajib `prefers-reduced-motion` override (durasi $0.01\text{ms}$).
+
+```css
+--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+--ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+--duration-fast: 150ms;
+--duration-normal: 250ms;
+--duration-slow: 400ms;
+```
+
+## 6. Mobile-First Interaction Patterns
+
+- **Touch Targets**: Minimum $44 \times 44\text{ px}$ (`--touch-target-min`).
+- **Tap Feedback**: Haptic visual `transform: scale(0.97)` berdurasi `100ms` pada `.btn` dan selectable cards.
+- **Mobile Bottom Bar / Sticky CTA**: Pada layar `< 768px`, tombol konfirmasi atau order step menempel di bawah (safe-area compliant).
 - **Cards (Material & Wash Type)**:
   - Default: Border `--color-border`, background `--color-surface`.
-  - Selected: Border `--color-primary` (2px), box-shadow `--shadow-md`, background `--color-primary` tint.
+  - Selected: Border `--color-primary` (2px), box-shadow `--shadow-md`, background `--color-primary-tint`.
 - **Glassmorphism Overlay**:
-  - `background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px);` digunakan pada floating badge Hero.
-- **Responsiveness**:
-  - Mobile-first: Breakpoints `<768px` (Mobile), `768px-1024px` (Tablet), `>1024px` (Desktop).
-  - Max container width: `1200px`.
+  - `background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px);` digunakan pada navbar sticky dan hero trust badges.
+- **Scroll & Stagger Effects**:
+  - Scroll progress bar di puncak viewport (`position: fixed; top: 0; height: 3px; background: var(--color-primary)`).
+  - Back-to-top floating button: muncul saat `window.scrollY > 350`, smooth translate & fade.
+  - Scroll reveal: `.reveal` transisi `opacity` & `translateY(20px)` $\rightarrow$ `.reveal-visible`.

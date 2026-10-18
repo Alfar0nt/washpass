@@ -10,7 +10,7 @@ export class PriceTable {
 
   render() {
     this.container.innerHTML = `
-      <section id="pricing" class="section price-table" aria-labelledby="pricing-title">
+      <section id="pricing" class="section price-table reveal" aria-labelledby="pricing-title">
         <div class="container">
           <div class="section-header">
             <h2 id="pricing-title" class="section-header__title">Daftar Harga</h2>

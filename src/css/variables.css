@@ -1,18 +1,29 @@
 :root {
-  /* Colors */
-  --color-primary: #0D9488;
-  --color-primary-dark: #0F766E;
-  --color-primary-light: #14B8A6;
+  /* Brand Primary (Clean Modern Aqua & Sky) */
+  --color-primary: #0284C7;
+  --color-primary-dark: #0369A1;
+  --color-primary-light: #38BDF8;
+  --color-primary-tint: #E0F2FE;
+
+  /* Accent (Warm Amber / Trust Gold) */
   --color-accent: #F59E0B;
   --color-accent-dark: #D97706;
-  --color-bg: #FAFAF9;
+  --color-accent-light: #FEF3C7;
+
+  /* Surfaces & Neutrals (Crisp Clean Slate) */
+  --color-bg: #F8FAFC;
   --color-surface: #FFFFFF;
-  --color-text: #1C1917;
-  --color-text-secondary: #78716C;
-  --color-text-muted: #A8A29E;
-  --color-success: #22C55E;
+  --color-text: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94A3B8;
+  --color-border: #E2E8F0;
+  --color-border-subtle: #F1F5F9;
+
+  /* Feedback & Status */
+  --color-success: #10B981;
+  --color-success-tint: #ECFDF5;
   --color-error: #EF4444;
-  --color-border: #E7E5E4;
+  --color-error-tint: #FEF2F2;
 
   /* Typography */
   --font-heading: 'Plus Jakarta Sans', sans-serif;
@@ -28,7 +39,7 @@
   --text-4xl: 2.25rem;
   --text-5xl: 3rem;
 
-  /* Spacing */
+  /* Spacing (4pt scale) */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -49,24 +60,42 @@
   --radius-2xl: 1.5rem;
   --radius-full: 9999px;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);
+  /* Elevation & Shadows */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
+  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
 
-  /* Transitions */
-  --transition-fast: 150ms ease;
-  --transition-base: 250ms ease;
-  --transition-slow: 350ms ease;
+  /* Motion Timing & Physics (Emil Kowalski curve standards) */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
 
-  /* Layout */
+  --transition-fast: var(--duration-fast) var(--ease-out);
+  --transition-base: var(--duration-normal) var(--ease-out);
+  --transition-slow: var(--duration-slow) var(--ease-out);
+
+  /* Layout & Mobile Controls */
   --max-width: 1200px;
   --container-padding: var(--space-4);
+  --touch-target-min: 44px;
 }
 
 @media (min-width: 768px) {
   :root {
     --container-padding: var(--space-8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0.01ms;
+    --duration-normal: 0.01ms;
+    --duration-slow: 0.01ms;
+    --transition-fast: none;
+    --transition-base: none;
+    --transition-slow: none;
   }
 }

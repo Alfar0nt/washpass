@@ -258,12 +258,115 @@ small, .text-xs {
   min-height: calc(100vh - 80px);
 }
 
-/* Add micro-animations for interactive elements */
+/* ==========================================================================
+   Motion System & Animations (Emil Kowalski Physics standard)
+   ========================================================================== */
+
+/* Top scroll reading progress bar */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--color-primary-light), var(--color-primary));
+  z-index: 9999;
+  transition: width 80ms linear;
+  box-shadow: 0 0 8px rgba(2, 132, 199, 0.4);
+}
+
+/* Floating Back to Top Button */
+.back-to-top {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 900;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px);
+  transition: opacity var(--duration-normal) var(--ease-out),
+              transform var(--duration-normal) var(--ease-out),
+              background var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out);
+}
+
+.back-to-top--visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top:hover {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.back-to-top:active {
+  transform: translateY(0) scale(0.96);
+}
+
+/* Scroll Reveal Elements */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity var(--duration-slow) var(--ease-out),
+              transform var(--duration-slow) var(--ease-out);
+  will-change: opacity, transform;
+}
+
+.reveal--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hero Entrance Stagger Animations */
+.hero-stagger-1 {
+  animation: heroFadeSlideIn 0.5s var(--ease-out) 0.1s backwards;
+}
+.hero-stagger-2 {
+  animation: heroFadeSlideIn 0.6s var(--ease-out) 0.2s backwards;
+}
+.hero-stagger-3 {
+  animation: heroFadeSlideIn 0.6s var(--ease-out) 0.3s backwards;
+}
+.hero-stagger-4 {
+  animation: heroFadeSlideIn 0.7s var(--ease-out) 0.4s backwards;
+}
+
+@keyframes heroFadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Interactive Card & Touch Press State */
 .category-card,
 .material-card,
 .wash-type-card,
 .btn {
-  transition: all var(--transition-fast);
+  transition: transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out);
 }
 
 .category-card:hover,
@@ -273,6 +376,13 @@ small, .text-xs {
   box-shadow: var(--shadow-md);
 }
 
+.category-card:active,
+.material-card:active,
+.wash-type-card:active,
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
 .category-card[data-selected],
 .material-card[data-selected],
 .wash-type-card[data-selected] {
@@ -280,24 +390,15 @@ small, .text-xs {
   box-shadow: var(--shadow-lg);
 }
 
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
-/* Add fade-in animation for step content */
+/* Step transition in wizard */
 .step-content {
-  animation: fadeIn 0.3s ease-out;
+  animation: stepEntrance 0.35s var(--ease-out);
 }
 
-@keyframes fadeIn {
+@keyframes stepEntrance {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -305,32 +406,37 @@ small, .text-xs {
   }
 }
 
-/* Add pulse animation for important buttons */
-.btn-primary {
-  animation: pulse 2s infinite;
+/* Subtle clean pulse for primary CTA */
+.btn-primary.pulse-cta {
+  box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.4);
+  animation: cleanPulse 2.5s infinite;
 }
 
-@keyframes pulse {
+@keyframes cleanPulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.4);
+    box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.4);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(13, 148, 136, 0);
+    box-shadow: 0 0 0 10px rgba(2, 132, 199, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(13, 148, 136, 0);
+    box-shadow: 0 0 0 0 rgba(2, 132, 199, 0);
   }
 }
 
 /* Loading spinner */
 .loading-spinner {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border: 2px solid var(--color-surface);
   border-top: 2px solid var(--color-primary);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.8s linear infinite;
   margin-right: var(--space-2);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 @media (max-width: 767px) {
@@ -345,5 +451,12 @@ small, .text-xs {
   .admin-main {
     padding: var(--space-4) 0;
     min-height: calc(100vh - 60px);
+  }
+
+  .back-to-top {
+    bottom: var(--space-4);
+    right: var(--space-4);
+    width: 40px;
+    height: 40px;
   }
 }

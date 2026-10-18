@@ -44,3 +44,6 @@ coverage/
 # Python artifacts (agent skill scripts)
 __pycache__/
 *.pyc
+
+# Local Claude CLI symlink from skills
+.claude/

@@ -6,6 +6,24 @@ Status komprehensif implementasi proyek WashPass. Pekerjaan tertunda diletakkan 
 
 ## ⏳ PENDING & NEXT TASKS (Prioritas Utama)
 
+### 0. UI/UX Redesign, Mobile-First & Motion Revamp (Selesai Implementasi)
+- [x] **0.1 Design System & Token Overhaul (`DESIGN.md` & `variables.css`)**:
+  - Terapkan palet baru: Electric Clean Blue / Modern Aqua (`#0284C7` / `#0369A1`), Crisp Neutral Dark Slate (`#0F172A`), Light Slate Canvas (`#F8FAFC`), Vibrant Amber Accent (`#F59E0B`).
+  - Update tipografi: Heading `Plus Jakarta Sans` (bold modern display), Body `Inter` (neutral legible).
+  - Setup token motion kurva Emil Kowalski (`--ease-out: cubic-bezier(0.16, 1, 0.3, 1)`, `--ease-in-out: cubic-bezier(0.65, 0, 0.35, 1)`), durasi mikro (`150ms`, `250ms`, `400ms`).
+  - Dukungan native `prefers-reduced-motion` token fallback.
+- [x] **0.2 Mobile-First Navigation & Layout Architecture**:
+  - Navbar responsive dengan fluid glassmorphism blur (`backdrop-filter: blur(12px)`), menu dropdown mobile accessible.
+  - Sticky mobile summary bar pada alur order `< 768px` (`.order-mobile-bar`), safe-area compliant.
+  - Sentuhan target interaktif $\ge 44 \times 44$ px, feedback haptic visual tap (active transform scale `0.98` & `0.96`).
+- [x] **0.3 Animasi & Motion Enhancements**:
+  - **Scroll Progress Bar**: Top reading progress indicator dinamis di puncak layar landing page (`.scroll-progress`).
+  - **Scroll Reveal / Stagger**: Menggunakan native CSS + `IntersectionObserver` ringan (`.reveal` $\rightarrow$ `.reveal--visible`) pada section How It Works, Why Us, Price Table, dan FAQ.
+  - **Hero Entrance**: Stagger fade-in + slide-up (`.hero-stagger-1` s/d `.hero-stagger-4`) saat landing pertama kali dimuat.
+  - **Back-to-Top Button**: Tombol floating interaktif pojok kanan bawah dengan transisi smooth saat scroll $> 300\text{px}$.
+- [x] **0.4 Review Kualitas & Production Build**:
+  - Build Vite production sukses tanpa error (`pnpm run build` berhasil menghasilkan bundle `dist/`).
+
 ### 1. Security Backlog
 - [ ] **Dependency Upgrade**: `multer@1.4.5-lts` punya kerentanan yang dipatch di 2.x, dan `uuid@9` sudah deprecated. Upgrade bersifat breaking → dikerjakan terpisah.
 

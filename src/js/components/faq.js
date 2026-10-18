@@ -10,11 +10,19 @@ export class FAQ {
 
   render() {
     this.container.innerHTML = `
-      <div class="faq" id="faq">
-        <div class="faq__list">
-          ${this.faqs.map((faq, index) => this.renderItem(faq, index)).join('')}
+      <section class="section faq-section reveal" aria-labelledby="faq-section-title">
+        <div class="container">
+          <div class="section-header">
+            <h2 id="faq-section-title" class="section-header__title">Pertanyaan yang Sering Diajukan</h2>
+            <p class="section-header__description">Temukan jawaban cepat seputar layanan kami</p>
+          </div>
+          <div class="faq" id="faq">
+            <div class="faq__list">
+              ${this.faqs.map((faq, index) => this.renderItem(faq, index)).join('')}
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
     `;
   }
 

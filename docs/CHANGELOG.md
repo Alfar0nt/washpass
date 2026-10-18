@@ -2,6 +2,35 @@
 
 ---
 
+## [v0.0.27] - 2026-10-18
+
+### Added
+- **Skills Ekosistem**: Menambahkan skill `animate` (Emil Kowalski Animation Philosophy) dan `copywriting` (`coreyhaines31/marketingskills`).
+- **Scroll & Motion Interactive**:
+  - Top scroll reading progress bar (`.scroll-progress`) dinamis di puncak layar landing page.
+  - Floating back-to-top button (`.back-to-top`) dengan transisi fade & translate saat scroll $> 300\text{px}$.
+  - Scroll reveal stagger menggunakan `IntersectionObserver` ringan pada section Cara Kerja, Keunggulan, Tabel Harga, dan FAQ.
+  - Stagger entrance animation (`.hero-stagger-1` s/d `4`) pada hero section saat render pertama kali.
+
+### Fixed
+- **WCAG AA Color Contrast & Visibility**:
+  - Memperbaiki konflik teks putih di atas latar belakang terang di hero section (`.hero__cta-primary`, `.hero__card`, stat badges).
+  - Memperbaiki margin, padding, dan alignment tombol CTA Hero dan FAQ accordion agar tidak mepet ke border/background container.
+  - Menyelaraskan touch target minimal $\ge 44 \times 44\text{px}$ pada seluruh button dan link navigasi.
+
+### Changed
+- **Design System & Color Tokens (`DESIGN.md` & `variables.css`)**:
+  - Mengubah brand primary ke Clean Modern Aqua (`#0284C7`), dark hover (`#0369A1`), tint wash (`#E0F2FE`), slate background (`#F8FAFC`), dan deep slate text (`#0F172A`).
+  - Menetapkan physics motion tokens (`--ease-out`, `--ease-in-out`, durasi 150ms/250ms/400ms) dengan dukungan otomatis `prefers-reduced-motion`.
+- **High-Converting Copywriting & Typography**:
+  - Mengubah headline dan copy hero section menjadi lebih berorientasi pada benefit nyata pelanggan ("Sepatu Bersih Seperti Baru, Tanpa Repot Keluar Rumah").
+  - Memperbaiki copywriting benefit dan alur langkah Cara Kerja agar lebih meyakinkan dan bebas dari frasa klise/kering.
+- **Mobile-First UX Optimization**:
+  - Menambahkan mobile sticky summary bar pada formulir order di layar resolusi $< 768\text{px}`.
+  - Memperbaiki layout navbar sticky dengan glassmorphism blur dan menu toggle responsif.
+
+---
+
 ## [v0.0.26] - 2026-10-17
 
 ### Removed

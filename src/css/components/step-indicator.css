@@ -104,8 +104,8 @@
 .step-indicator__step--active .step-indicator__icon {
   background: var(--color-primary);
   color: white;
-  transform: scale(1.1);
-  box-shadow: 0 0 0 4px var(--color-surface), 0 0 0 6px var(--color-primary);
+  transform: scale(1.08);
+  box-shadow: 0 0 0 3px var(--color-surface), 0 0 0 5px var(--color-primary-light);
 }
 
 .step-indicator__step--active .step-indicator__label {

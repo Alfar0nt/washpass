@@ -198,6 +198,56 @@
   justify-content: center;
 }
 
+/* Mobile Sticky Bottom Summary & Proceed Bar */
+.order-mobile-bar {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .order-mobile-bar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-3) var(--space-4);
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+    box-shadow: 0 -4px 12px rgba(15, 23, 42, 0.06);
+  }
+
+  .order-mobile-bar__info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .order-mobile-bar__count {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .order-mobile-bar__total {
+    font-size: var(--text-base);
+    font-weight: 800;
+    color: var(--color-primary);
+    font-family: var(--font-heading);
+  }
+
+  .order-mobile-bar__action {
+    min-width: 130px;
+  }
+
+  /* Extra bottom padding on step container so floating bar doesn't obscure buttons */
+  #stepContent {
+    padding-bottom: 80px;
+  }
+}
+
 .order-success__mock {
   display: flex;
   flex-wrap: wrap;

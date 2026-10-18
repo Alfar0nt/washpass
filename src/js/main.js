@@ -6,6 +6,7 @@ import { initWhyUs } from './components/why-us.js';
 import { initPriceTable } from './components/price-table.js';
 import { initFooter } from './components/footer.js';
 import { initNavbarHeightOffset } from './utils/navbar-height.js';
+import { initScrollProgress, initBackToTop, initScrollReveal } from './utils/scroll-effects.js';
 
 function init() {
   const app = document.getElementById('app');
@@ -60,6 +61,11 @@ function init() {
   });
   
   initFooter(document.getElementById('footer'));
+
+  // Initialize interactive motion & scroll animations
+  initScrollProgress();
+  initBackToTop();
+  initScrollReveal();
 }
 
 if (document.readyState === 'loading') {
