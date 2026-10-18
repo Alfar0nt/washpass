@@ -540,3 +540,31 @@
     right: var(--space-2);
   }
 }
+.admin-detail__copy {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.admin-detail__copy:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.admin-detail__copy svg {
+  width: 14px;
+  height: 14px;
+}
+
+.admin-detail__cancel {
+  margin-top: var(--space-3);
+}

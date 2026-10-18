@@ -19,6 +19,7 @@ export default defineConfig({
         privacy: path.resolve(__dirname, 'src/privacy.html'),
         terms: path.resolve(__dirname, 'src/terms.html'),
         track: path.resolve(__dirname, 'src/track.html'),
+        '404': path.resolve(__dirname, 'src/404.html'),
       },
     },
   },

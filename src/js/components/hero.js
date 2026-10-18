@@ -42,7 +42,7 @@ export class Hero {
                     </svg>
                   </div>
                   <div class="hero__card-info">
-                    <h4>Semudah 3 Langkah</h4>
+                    <h2>Semudah 3 Langkah</h2>
                     <p>Tanpa repot keluar rumah</p>
                   </div>
                 </div>
@@ -50,21 +50,21 @@ export class Hero {
                   <li class="hero__step">
                     <span class="hero__step-num">1</span>
                     <div>
-                      <h5>Pesan &amp; Jemput</h5>
+                      <h3>Pesan &amp; Jemput</h3>
                       <p>Booking online, kurir menjemput di depan pintu</p>
                     </div>
                   </li>
                   <li class="hero__step">
                     <span class="hero__step-num">2</span>
                     <div>
-                      <h5>Dicuci Sesuai Bahan</h5>
+                      <h3>Dicuci Sesuai Bahan</h3>
                       <p>Perawatan khusus kulit, suede, canvas, hingga sandal</p>
                     </div>
                   </li>
                   <li class="hero__step">
                     <span class="hero__step-num">3</span>
                     <div>
-                      <h5>Diantar Kembali</h5>
+                      <h3>Diantar Kembali</h3>
                       <p>Sepatu bersih, wangi, dan siap dipakai lagi</p>
                     </div>
                   </li>

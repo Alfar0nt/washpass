@@ -191,6 +191,11 @@
 |---|---------|-------|-----------|
 | 1 | Landing Page | `/` | Homepage dengan informasi layanan |
 | 2 | Order Flow | `/order` | Multi-step form pemesanan |
+| 3 | Lacak Pesanan | `/track` | Cek status pesanan via nomor pesanan (noindex) |
+| 4 | Admin Panel | `/admin` | Manajemen pesanan (noindex) |
+| 5 | Kebijakan Privasi | `/privacy` | Kebijakan privasi (HTML statis) |
+| 6 | Syarat & Ketentuan | `/terms` | Syarat & ketentuan (HTML statis) |
+| 7 | 404 | `/404` | Halaman tidak ditemukan |
 
 ### 4.2 Komponen Utama
 
@@ -332,8 +337,10 @@ Terima kasih telah memesan di WashPass! 🙏
 |--------|----------|-----------|
 | `POST` | `/api/orders` | Submit order baru (multipart form data — termasuk foto + lokasi GPS) |
 | `GET` | `/api/orders` | List semua order (untuk admin page) |
+| `GET` | `/api/orders/stats` | Statistik agregat (count per status, order & pendapatan hari ini) |
+| `GET` | `/api/orders/track/:id` | Lacak order publik (field terbatas, tanpa PII) |
 | `GET` | `/api/orders/:id` | Detail satu order (include latitude, longitude) |
-| `PATCH` | `/api/orders/:id/status` | Update status order (pending | picked_up | in_progress | done) |
+| `PATCH` | `/api/orders/:id/status` | Update status order (pending | picked_up | in_progress | done | cancelled) |
 | `GET` | `/uploads/:filename` | Serve foto yang di-upload |
 
 ### 8.3 Database Schema
@@ -448,9 +455,9 @@ Untuk versi pertama ini, berikut yang **TERMASUK** dan **TIDAK TERMASUK**:
 - Fully responsive (mobile, tablet, desktop)
 
 ### ❌ Tidak Termasuk (Future)
-- Sistem login / akun user / auth admin
+- Sistem login / akun user / auth admin — **keputusan MVP: panel admin tanpa autentikasi** (accepted risk), auth ditunda pasca-launch
 - Payment gateway
-- Order tracking real-time (untuk customer)
+- Order tracking real-time / push (tracking dasar via nomor pesanan sudah tersedia di `/track`)
 - Notifikasi otomatis (email/push)
 - Penjadwalan pickup
 - Sistem review / rating

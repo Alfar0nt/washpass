@@ -3,7 +3,7 @@
 Instruksi dan standar kerja autonomous agent di codebase WashPass.
 
 ## Project Status
-**Phase 1-6 & 8.2 Selesai** — Phase 7 (Polish/Lighthouse), 8.1 (Brand Assets), 9 (Payment Midtrans) pending. Roadmap kini diprioritaskan P0–P7 (audit customer + admin). Rujukan: `.ai/IMPLEMENTATION-PLAN.md`.
+**MVP Ready** — audit remediasi P0–P5 selesai (tracking, admin ops, status batal, SEO, keamanan, tooling). Tersisa **P6 (Brand Assets)** & **P7 (Payment/Auth — ditunda pasca-launch)**. Rujukan: `.ai/IMPLEMENTATION-PLAN.md`.
 
 ## Core Agent Rules & Environment
 
@@ -53,8 +53,10 @@ washpass/
 │   ├── index.html          # Landing page
 │   ├── order.html          # Multi-step order flow
 │   ├── admin.html          # Admin management panel
-│   ├── privacy.html        # Kebijakan privasi
-│   ├── terms.html          # Syarat dan ketentuan
+│   ├── track.html          # Halaman lacak status pesanan
+│   ├── privacy.html        # Kebijakan privasi (HTML statis)
+│   ├── terms.html          # Syarat dan ketentuan (HTML statis)
+│   ├── 404.html            # Halaman tidak ditemukan
 │   ├── css/
 │   │   ├── reset.css
 │   │   ├── variables.css   # Single source of truth untuk design tokens
@@ -65,12 +67,14 @@ washpass/
 │   │   ├── main.js         # Landing page entry point
 │   │   ├── order.js        # Order flow logic
 │   │   ├── admin.js        # Admin page logic
+│   │   ├── track.js        # Lacak pesanan logic
+│   │   ├── legal.js        # Legal pages bootstrap (footer)
 │   │   ├── config/pricing.js # Source of truth harga & katalog
 │   │   ├── components/     # Reusable UI component modules
 │   │   ├── services/api.js # API client HTTP
-│   │   └── utils/          # Helper modules (cart, formatters, validators, dll.)
+│   │   └── utils/          # Helper modules (+ *.test.js Vitest)
 │   └── assets/
-├── public/                 # Static assets (favicon, manifest, og-image)
+├── public/                 # Static assets (favicon, manifest, og-image, icons, sitemap.xml, robots.txt)
 ├── .ai/                    # Dokumentasi terstruktur proyek
 │   ├── PRD.md              # Product Requirement Document
 │   ├── TRD.md              # Technical Requirements Document
@@ -79,6 +83,10 @@ washpass/
 │   └── DESIGN.md           # Design tokens, komponen UI & styling specs
 ├── AGENTS.md               # Pedoman agent (file ini)
 ├── README.md               # Dokumentasi umum repo
+├── docs/CHANGELOG.md       # Riwayat versi
+├── eslint.config.js        # ESLint flat config
+├── vitest.config.js        # Konfigurasi Vitest
+├── .env.example            # Contoh environment variables
 └── vite.config.js
 ```
 
@@ -87,8 +95,10 @@ washpass/
 |---|---|---|
 | `POST` | `/api/orders` | Buat order baru (multipart: data + items + foto + GPS) |
 | `GET` | `/api/orders` | Ambil daftar semua order (support `?status=`) |
+| `GET` | `/api/orders/stats` | Statistik agregat (count per status, order & pendapatan hari ini) |
+| `GET` | `/api/orders/track/:id` | Lacak order publik (field terbatas, tanpa PII) |
 | `GET` | `/api/orders/:id` | Ambil detail spesifik order |
-| `PATCH` | `/api/orders/:id/status` | Update status (`pending` → `picked_up` → `in_progress` → `done`) |
+| `PATCH` | `/api/orders/:id/status` | Update status (`pending` → `picked_up` → `in_progress` → `done`, atau `cancelled` dari `pending`/`picked_up`) |
 | `GET` | `/uploads/:filename` | Sajikan foto sepatu yang diunggah |
 
 ## Development Commands
@@ -99,6 +109,9 @@ pnpm run dev         # Frontend saja
 pnpm run dev:server  # Backend Express saja
 pnpm run build       # Build bundle frontend ke folder dist/
 pnpm run start       # Jalankan server Express production (melayani API + dist/)
+pnpm run lint        # ESLint (flat config)
+pnpm run format      # Prettier (write)
+pnpm test            # Vitest (unit test utils)
 pnpm run clean:ports # Bersihkan port 3000 & 5173 jika hang/bentrok
 ```
 

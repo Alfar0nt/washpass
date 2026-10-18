@@ -1,8 +1,6 @@
 @import './reset.css';
 @import './variables.css';
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
-
 :root {
   --font-size-fluid-sm: clamp(0.875rem, 0.875rem + 0vw, 1rem);
   --font-size-fluid-base: clamp(1rem, 1rem + 0vw, 1.125rem);

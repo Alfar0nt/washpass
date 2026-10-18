@@ -1,6 +1,6 @@
 {
   "name": "washpass",
-  "version": "v0.0.26",
+  "version": "v0.0.28",
   "description": "Website jasa pencucian sepatu dan sandal dengan sistem pick-up → cuci → antar kembali",
   "type": "module",
   "scripts": {
@@ -9,6 +9,11 @@
     "dev:all": "concurrently \"pnpm run dev\" \"pnpm run dev:server\"",
     "build": "vite build",
     "start": "NODE_ENV=production node server/index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
     "clean:ports": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true; lsof -ti:5173 | xargs kill -9 2>/dev/null || true; echo 'Ports cleared'"
   },
   "dependencies": {
@@ -16,13 +21,19 @@
     "express": "^4.19.2",
     "express-rate-limit": "^8.7.1",
     "helmet": "^8.3.0",
-    "multer": "^1.4.5-lts.1",
+    "multer": "^2.4.0",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
-    "uuid": "^9.0.1"
+    "uuid": "^14.0.3"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "concurrently": "^8.2.2",
-    "vite": "^5.2.0"
+    "eslint": "^10.13.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10",
+    "vite": "^5.2.0",
+    "vitest": "^3.2.7"
   }
 }

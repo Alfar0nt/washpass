@@ -226,3 +226,74 @@
     display: none;
   }
 }
+/* Stats cards */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+
+.admin-stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-stat-card__value {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1.1;
+}
+
+.admin-stat-card__label {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.admin-stat-card--pending { border-left-color: #D97706; }
+.admin-stat-card--picked_up { border-left-color: #2563EB; }
+.admin-stat-card--in_progress { border-left-color: #EA580C; }
+.admin-stat-card--done { border-left-color: #16A34A; }
+.admin-stat-card--cancelled { border-left-color: #DC2626; }
+
+/* Search & filter controls */
+.admin-filter--search {
+  min-width: 220px;
+}
+
+.admin-cell-sub {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+@media (max-width: 767px) {
+  .admin-order-list__filters {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .admin-filter,
+  .admin-filter--search,
+  .admin-order-list__filters .btn {
+    flex: 1 1 45%;
+    min-width: 0;
+  }
+}
+
+/* Status badge colors */
+.status-badge--pending { background: #FEF3C7; color: #B45309; border: 1px solid #FCD34D; }
+.status-badge--picked-up { background: #DBEAFE; color: #1D4ED8; border: 1px solid #93C5FD; }
+.status-badge--in-progress { background: #FFEDD5; color: #C2410C; border: 1px solid #FDBA74; }
+.status-badge--done { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
+.status-badge--cancelled { background: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5; }

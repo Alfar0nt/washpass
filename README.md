@@ -4,7 +4,7 @@ Website jasa cuci sepatu & sandal profesional dengan sistem pickup & delivery.
 
 ## Status
 
-**Phase 1-6 & 8.2 Complete** | **Phase 7, 8.1, 9 Pending**
+**MVP Ready** — audit remediasi P0–P5 selesai (tracking pesanan, admin ops, status batal, SEO, keamanan, tooling). Tersisa **P6 (Brand Assets)** & **P7 (Payment/Auth — ditunda pasca-launch)**.
 
 See [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) for version history and changelog.
 
@@ -46,9 +46,11 @@ Click an image to view it in fullscreen.
 |-----|-------------|
 | `/` | Landing page |
 | `/order` | Order flow |
+| `/track` | Lacak status pesanan (input nomor pesanan) |
 | `/admin` | Admin panel |
 | `/privacy` | Privacy policy |
 | `/terms` | Terms & conditions |
+| `/404` | Halaman tidak ditemukan (fallback) |
 
 ## Development
 
@@ -70,22 +72,29 @@ pnpm run build
 
 # Production server (serves dist/ + API)
 pnpm run start
+
+# Quality checks
+pnpm run lint          # ESLint
+pnpm run format        # Prettier (write)
+pnpm run format:check  # Prettier (check)
+pnpm test              # Vitest
 ```
 
 ## Tech Stack
 
 - **Frontend**: Vite + Vanilla JS (ES Modules)
-- **Backend**: Express.js + SQLite
+- **Backend**: Express.js + SQLite (`sqlite3` + `sqlite`), helmet + rate limiting
+- **Upload**: Multer 2.x (magic-byte validation) + Canvas API compression (client)
 - **Maps**: Leaflet.js + OpenStreetMap
 - **Location**: Browser Geolocation API + Nominatim reverse geocoding
 - **CSS**: Vanilla CSS + Custom Properties (Design Tokens)
 - **Fonts**: Plus Jakarta Sans + Inter (Google Fonts)
+- **Tooling**: ESLint + Prettier + Vitest
 
 ## Next Steps
 
-1. **Phase 7**: Polish (accessibility, Lighthouse audit, cross-browser & responsive)
-2. **Phase 8.1**: Assets (logo, illustrations, material & step iconography)
-3. **Phase 9**: Payment Gateway — Midtrans Snap (QRIS, e-wallet, bank transfer) — *ditunda sampai MVP launch*
-4. **Production deployment** — Build & deploy to Railway/Render/VPS
+1. **P6 — Brand Assets**: logo SVG, ilustrasi hero, ikon material & step (skill `design`)
+2. **P7 — Ditunda pasca-MVP**: Payment Gateway Midtrans Snap, auth admin, notifikasi, dll.
+3. **Production deployment** — Build & deploy to Railway/Render/VPS (ganti domain placeholder di `sitemap.xml` & `robots.txt`)
 
-Lihat [`.ai/IMPLEMENTATION-PLAN.md`](./.ai/IMPLEMENTATION-PLAN.md) untuk prioritas terkini (P0–P7).
+Lihat [`.ai/IMPLEMENTATION-PLAN.md`](./.ai/IMPLEMENTATION-PLAN.md) untuk status terkini.

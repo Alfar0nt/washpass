@@ -1,20 +1,35 @@
-import { getOrders } from '../services/api.js';
-import { formatCurrency, formatDate, formatRelativeTime } from '../utils/formatters.js';
+import { getOrders, getOrderStats } from '../services/api.js';
+import { formatCurrency, formatRelativeTime } from '../utils/formatters.js';
 import { getStatusLabel, getStatusBadgeClass, ORDER_STATUSES } from '../utils/status.js';
+
+const REFRESH_INTERVAL_MS = 30000;
 
 export class OrderList {
   constructor(container, options = {}) {
     this.container = container;
     this.onOrderClick = options.onOrderClick || (() => {});
     this.onRefresh = options.onRefresh || (() => {});
-    this.statusFilter = options.statusFilter || null;
-    
+    this.initialStatusFilter = options.statusFilter || null;
+
     this.orders = [];
+    this.stats = null;
     this.isLoading = false;
-    
+    this.searchQuery = '';
+    this.statusFilter = this.initialStatusFilter;
+    this.dateFilter = 'all';
+    this.sortOrder = 'newest';
+
     this.render();
     this.bindEvents();
-    this.loadOrders();
+    this.refresh();
+
+    this.refreshInterval = setInterval(() => {
+      if (!document.hidden) this.refresh(true);
+    }, REFRESH_INTERVAL_MS);
+  }
+
+  destroy() {
+    if (this.refreshInterval) clearInterval(this.refreshInterval);
   }
 
   render() {
@@ -23,13 +38,29 @@ export class OrderList {
         <div class="admin-order-list__header">
           <h1 class="admin-order-list__title">Daftar Pesanan</h1>
           <div class="admin-order-list__filters">
+            <input
+              type="search"
+              class="admin-filter admin-filter--search"
+              id="searchInput"
+              placeholder="Cari nama / WhatsApp / ID..."
+              aria-label="Cari pesanan"
+            >
             <select class="admin-filter" id="statusFilter" aria-label="Filter status">
               <option value="">Semua Status</option>
               ${Object.values(ORDER_STATUSES).map(status => `
-                <option value="${status}" ${this.statusFilter === status ? 'selected' : ''}>
+                <option value="${status}" ${this.initialStatusFilter === status ? 'selected' : ''}>
                   ${getStatusLabel(status)}
                 </option>
               `).join('')}
+            </select>
+            <select class="admin-filter" id="dateFilter" aria-label="Filter tanggal">
+              <option value="all">Semua Tanggal</option>
+              <option value="today">Hari Ini</option>
+              <option value="week">7 Hari Terakhir</option>
+            </select>
+            <select class="admin-filter" id="sortOrder" aria-label="Urutkan">
+              <option value="newest">Terbaru</option>
+              <option value="oldest">Terlama</option>
             </select>
             <button type="button" class="btn btn-outline" id="refreshBtn">
               <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -41,6 +72,8 @@ export class OrderList {
           </div>
         </div>
 
+        <div class="admin-stats" id="statsRow"></div>
+
         <div class="admin-order-list__content" id="ordersContent">
           <div class="admin-loading" id="loadingState">
             <div class="loading-spinner"></div>
@@ -51,7 +84,7 @@ export class OrderList {
               <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <h3>Belum ada pesanan</h3>
-            <p>Pesanan akan muncul di sini saat customer memesan</p>
+            <p id="emptyStateText">Pesanan akan muncul di sini saat customer memesan</p>
           </div>
           <div class="admin-table-container" id="tableContainer" style="display: none;">
             <table class="admin-table" role="table">
@@ -78,33 +111,87 @@ export class OrderList {
 
     this.loadingState = this.container.querySelector('#loadingState');
     this.emptyState = this.container.querySelector('#emptyState');
+    this.emptyStateText = this.container.querySelector('#emptyStateText');
     this.tableContainer = this.container.querySelector('#tableContainer');
     this.cardList = this.container.querySelector('#cardList');
     this.tableBody = this.container.querySelector('#ordersTableBody');
-    this.statusFilter = this.container.querySelector('#statusFilter');
+    this.statsRow = this.container.querySelector('#statsRow');
+    this.searchInput = this.container.querySelector('#searchInput');
+    this.statusFilterEl = this.container.querySelector('#statusFilter');
+    this.dateFilterEl = this.container.querySelector('#dateFilter');
+    this.sortOrderEl = this.container.querySelector('#sortOrder');
     this.refreshBtn = this.container.querySelector('#refreshBtn');
   }
 
   bindEvents() {
-    this.statusFilter.addEventListener('change', (e) => {
+    this.searchInput.addEventListener('input', (e) => {
+      this.searchQuery = e.target.value.trim().toLowerCase();
+      this.renderOrders();
+    });
+
+    this.statusFilterEl.addEventListener('change', (e) => {
       this.statusFilter = e.target.value || null;
       this.loadOrders();
     });
 
-    this.refreshBtn.addEventListener('click', () => this.loadOrders());
+    this.dateFilterEl.addEventListener('change', (e) => {
+      this.dateFilter = e.target.value;
+      this.renderOrders();
+    });
+
+    this.sortOrderEl.addEventListener('change', (e) => {
+      this.sortOrder = e.target.value;
+      this.renderOrders();
+    });
+
+    this.refreshBtn.addEventListener('click', () => this.refresh());
   }
 
-  async loadOrders() {
-    this.setLoading(true);
-    
+  async refresh(silent = false) {
+    await Promise.all([this.loadOrders(silent), this.loadStats()]);
+  }
+
+  async loadStats() {
+    try {
+      this.stats = await getOrderStats();
+      this.renderStats();
+    } catch (error) {
+      console.error('Failed to load stats:', error);
+    }
+  }
+
+  renderStats() {
+    if (!this.stats) return;
+    const { byStatus = {}, todayOrders = 0, todayRevenue = 0 } = this.stats;
+    const cards = [
+      { label: 'Belum Diambil', value: byStatus.pending || 0, tone: 'pending' },
+      { label: 'Sudah Diambil', value: byStatus.picked_up || 0, tone: 'picked_up' },
+      { label: 'Dikerjakan', value: byStatus.in_progress || 0, tone: 'in_progress' },
+      { label: 'Selesai', value: byStatus.done || 0, tone: 'done' },
+      { label: 'Dibatalkan', value: byStatus.cancelled || 0, tone: 'cancelled' },
+      { label: 'Order Hari Ini', value: todayOrders, tone: 'neutral' },
+      { label: 'Pendapatan Hari Ini', value: formatCurrency(todayRevenue), tone: 'neutral' },
+    ];
+
+    this.statsRow.innerHTML = cards.map(card => `
+      <div class="admin-stat-card admin-stat-card--${card.tone}">
+        <span class="admin-stat-card__value">${card.value}</span>
+        <span class="admin-stat-card__label">${card.label}</span>
+      </div>
+    `).join('');
+  }
+
+  async loadOrders(silent = false) {
+    if (!silent) this.setLoading(true);
+
     try {
       this.orders = await getOrders(this.statusFilter);
       this.renderOrders();
     } catch (error) {
       console.error('Failed to load orders:', error);
-      this.showError('Gagal memuat pesanan');
+      if (!silent) this.showError('Gagal memuat pesanan');
     } finally {
-      this.setLoading(false);
+      if (!silent) this.setLoading(false);
     }
   }
 
@@ -112,7 +199,7 @@ export class OrderList {
     this.isLoading = loading;
     this.loadingState.style.display = loading ? 'flex' : 'none';
     this.refreshBtn.disabled = loading;
-    
+
     if (loading) {
       this.refreshBtn.innerHTML = '<span class="loading-spinner"></span><span>Memuat...</span>';
     } else {
@@ -120,31 +207,82 @@ export class OrderList {
     }
   }
 
+  getVisibleOrders() {
+    let list = [...this.orders];
+
+    if (this.searchQuery) {
+      const q = this.searchQuery;
+      const qDigits = q.replace(/\D/g, '');
+      list = list.filter(order => {
+        const nameMatch = (order.customer_name || '').toLowerCase().includes(q);
+        const idMatch = String(order.id) === q || String(order.id).includes(q);
+        const waDigits = (order.whatsapp || '').replace(/\D/g, '');
+        const waMatch = qDigits.length > 0 && waDigits.includes(qDigits);
+        return nameMatch || idMatch || waMatch;
+      });
+    }
+
+    if (this.dateFilter !== 'all') {
+      const todayStr = this.localDateStr(new Date());
+      list = list.filter(order => {
+        const orderDate = (order.created_at || '').slice(0, 10);
+        if (this.dateFilter === 'today') return orderDate === todayStr;
+        if (this.dateFilter === 'week') {
+          const created = new Date((order.created_at || '').replace(' ', 'T'));
+          if (isNaN(created.getTime())) return false;
+          return (Date.now() - created.getTime()) <= 7 * 86400000;
+        }
+        return true;
+      });
+    }
+
+    if (this.sortOrder === 'oldest') list.reverse();
+
+    return list;
+  }
+
+  localDateStr(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
   renderOrders() {
-    if (this.orders.length === 0) {
+    const orders = this.getVisibleOrders();
+
+    if (orders.length === 0) {
       this.emptyState.style.display = 'flex';
       this.tableContainer.style.display = 'none';
       this.cardList.style.display = 'none';
+      this.emptyStateText.textContent = this.orders.length > 0
+        ? 'Tidak ada pesanan yang cocok dengan filter/pencarian'
+        : 'Pesanan akan muncul di sini saat customer memesan';
       return;
     }
 
     this.emptyState.style.display = 'none';
-    
+
     const isMobile = window.innerWidth < 768;
-    
+
     if (isMobile) {
       this.tableContainer.style.display = 'none';
       this.cardList.style.display = 'block';
-      this.renderCardList();
+      this.renderCardList(orders);
     } else {
       this.tableContainer.style.display = 'block';
       this.cardList.style.display = 'none';
-      this.renderTable();
+      this.renderTable(orders);
     }
   }
 
-  renderTable() {
-    this.tableBody.innerHTML = this.orders.map(order => `
+  completedBadge(order) {
+    if (order.status !== ORDER_STATUSES.DONE || !order.updated_at) return '';
+    return `<span class="admin-cell-sub">Selesai ${formatRelativeTime(order.updated_at)}</span>`;
+  }
+
+  renderTable(orders) {
+    this.tableBody.innerHTML = orders.map(order => `
       <tr data-order-id="${order.id}" tabindex="0" role="button" aria-label="Lihat detail pesanan ${order.id}">
         <td>${order.id}</td>
         <td>${this.escapeHtml(order.customer_name)}</td>
@@ -155,7 +293,10 @@ export class OrderList {
         </td>
         <td>${order.total_items || 0} pasang</td>
         <td>${formatCurrency(order.total_price)}</td>
-        <td>${formatRelativeTime(order.created_at)}</td>
+        <td>
+          ${formatRelativeTime(order.created_at)}
+          ${this.completedBadge(order)}
+        </td>
         <td>
           <span class="status-badge ${getStatusBadgeClass(order.status)}">
             ${getStatusLabel(order.status)}
@@ -179,40 +320,11 @@ export class OrderList {
       </tr>
     `).join('');
 
-    this.tableBody.querySelectorAll('.detail-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const orderId = parseInt(btn.dataset.orderId);
-        this.onOrderClick(orderId);
-      });
-    });
-
-    this.tableBody.querySelectorAll('.location-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const lat = parseFloat(btn.dataset.lat);
-        const lng = parseFloat(btn.dataset.lng);
-        this.openMap(lat, lng);
-      });
-    });
-
-    this.tableBody.querySelectorAll('tr[data-order-id]').forEach(row => {
-      row.addEventListener('click', () => {
-        const orderId = parseInt(row.dataset.orderId);
-        this.onOrderClick(orderId);
-      });
-      row.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          const orderId = parseInt(row.dataset.orderId);
-          this.onOrderClick(orderId);
-        }
-      });
-    });
+    this.bindRowEvents(this.tableBody, 'tr[data-order-id]');
   }
 
-  renderCardList() {
-    this.cardList.innerHTML = this.orders.map(order => `
+  renderCardList(orders) {
+    this.cardList.innerHTML = orders.map(order => `
       <article class="admin-card" data-order-id="${order.id}" tabindex="0" role="button" aria-label="Lihat detail pesanan ${order.id}">
         <div class="admin-card__header">
           <div>
@@ -231,6 +343,9 @@ export class OrderList {
           <span>${order.total_items || 0} item</span>
           <span>${formatCurrency(order.total_price)}</span>
         </div>
+        ${order.status === ORDER_STATUSES.DONE && order.updated_at ? `
+          <span class="admin-cell-sub">Selesai ${formatRelativeTime(order.updated_at)}</span>
+        ` : ''}
         ${order.latitude && order.longitude ? `
           <button type="button" class="btn btn-ghost btn-sm location-btn" data-lat="${order.latitude}" data-lng="${order.longitude}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -244,33 +359,30 @@ export class OrderList {
       </article>
     `).join('');
 
-    this.cardList.querySelectorAll('.detail-btn').forEach(btn => {
+    this.bindRowEvents(this.cardList, '.admin-card');
+  }
+
+  bindRowEvents(root, selector) {
+    root.querySelectorAll('.detail-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const orderId = parseInt(btn.dataset.orderId);
-        this.onOrderClick(orderId);
+        this.onOrderClick(parseInt(btn.dataset.orderId));
       });
     });
 
-    this.cardList.querySelectorAll('.location-btn').forEach(btn => {
+    root.querySelectorAll('.location-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const lat = parseFloat(btn.dataset.lat);
-        const lng = parseFloat(btn.dataset.lng);
-        this.openMap(lat, lng);
+        this.openMap(parseFloat(btn.dataset.lat), parseFloat(btn.dataset.lng));
       });
     });
 
-    this.cardList.querySelectorAll('.admin-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const orderId = parseInt(card.dataset.orderId);
-        this.onOrderClick(orderId);
-      });
-      card.addEventListener('keydown', (e) => {
+    root.querySelectorAll(selector).forEach(el => {
+      el.addEventListener('click', () => this.onOrderClick(parseInt(el.dataset.orderId)));
+      el.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          const orderId = parseInt(card.dataset.orderId);
-          this.onOrderClick(orderId);
+          this.onOrderClick(parseInt(el.dataset.orderId));
         }
       });
     });
@@ -319,7 +431,7 @@ export class OrderList {
         <span>Coba Lagi</span>
       </button>
     `;
-    this.container.querySelector('#retryBtn')?.addEventListener('click', () => this.loadOrders());
+    this.container.querySelector('#retryBtn')?.addEventListener('click', () => this.refresh());
   }
 }
 

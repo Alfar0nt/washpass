@@ -76,15 +76,15 @@ if (NODE_ENV === 'production') {
   });
 
   app.get('*', (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
+    res.status(404).sendFile(path.join(distPath, '404.html'));
   });
 }
 
 app.use((err, req, res, next) => {
   console.error('Server error:', err);
   // Multer errors are client input problems, not server faults
-  if (err.name === 'MulterError') {
-    return res.status(400).json({ error: err.message });
+  if (err.name === 'MulterError' || err.status === 400) {
+    return res.status(400).json({ error: err.message || 'Permintaan tidak valid' });
   }
   res.status(500).json({ error: 'Internal server error' });
 });

@@ -8,8 +8,10 @@ Dokumentasi arsitektur alur pengguna, peta situs, state navigasi, dan interaksi 
 graph TD
     A["Landing Page (/)"] --> B["Order Flow (/order)"]
     A --> C["Admin Panel (/admin)"]
+    A --> F["Lacak Pesanan (/track)"]
     A --> D["Privacy Policy (/privacy)"]
     A --> E["Terms & Conditions (/terms)"]
+    A --> G["404 - Not Found"]
 
     A --> A1["#hero — Hero Section"]
     A --> A2["#cara-kerja — How It Works"]
@@ -43,14 +45,17 @@ stateDiagram-v2
     pending --> picked_up: Kurir jemput sepatu
     picked_up --> in_progress: Sepatu sedang dicuci
     in_progress --> done: Sepatu selesai dan diantar
+    pending --> cancelled: Dibatalkan admin
+    picked_up --> cancelled: Dibatalkan admin
     done --> [*]
+    cancelled --> [*]
 ```
 
 ## 3. Wireframes & Layout Overview
 
 ### 3.1 Landing Page (`/` / `index.html`)
 - **Navbar**: Sticky, transparent to solid on scroll, dynamic offset (`ResizeObserver`), menu hamburger mobile, logo, navigasi section, CTA "Pesan Sekarang".
-- **Hero**: Catchy headline, CTA button link `/order`, badge trust `500+ Sepatu Dicuci` & `4.9 Rating`.
+- **Hero**: Catchy headline, CTA ke `/order` & `#how-it-works`, badge "Antar Jemput Gratis Se-Jabodetabek • Garansi Cuci Ulang", kartu "Semudah 3 Langkah" + tautan "Lacak status pesanan" ke `/track`.
 - **Cara Kerja (3 Langkah)**: Pesan Online → Kurir Jemput → Bersih & Antar Kembali.
 - **Keunggulan**: Free Pickup & Delivery, Pembersih Profesional, Transparan, Garansi Kepuasan.
 - **Tabel Harga**: Toggle tab Sepatu vs Sandal, matrix bahan vs jenis cuci, link langsung isi keranjang.
@@ -74,13 +79,18 @@ Container dinamis single container dengan step progress indicator bar di bagian 
    - Tombol "Kirim Pesanan" (menjalankan AJAX POST multipart form ke server, lalu membuka template teks WhatsApp ke admin).
 
 ### 3.3 Admin Panel (`/admin` / `admin.html`)
-- **Dashboard Summary**: Total order, status breakdown (`pending`, `picked_up`, `in_progress`, `done`).
-- **Tabel Pesanan**: Kolom ID, tanggal, nama, WA (direct link WhatsApp), item count, total harga, status badge, action button.
+- **Statistik**: Kartu count per status (`pending`, `picked_up`, `in_progress`, `done`, `cancelled`), order hari ini, dan pendapatan hari ini (`GET /api/orders/stats`).
+- **Tabel Pesanan**: Kolom ID, tanggal, nama, WA (direct link WhatsApp), item count, total harga, status badge, action button. Dilengkapi pencarian (nama/WA/ID), filter tanggal, sort, dan auto-refresh 30 detik.
 - **Detail Modal**:
    - Data pelanggan lengkap
    - Titik koordinat via Leaflet.js interactive map view
    - Daftar item cuci beserta foto kondisi sepatu (thumbnail click to full preview)
-   - Form transisi status pesanan (`PATCH /api/orders/:id/status`)
+   - Form transisi status pesanan (`PATCH /api/orders/:id/status`) dengan konfirmasi, tombol "Batalkan Pesanan", salin ID, serta tampilan `updated_at`
+
+### 3.4 Lacak Pesanan (`/track` / `track.html`)
+- Input nomor pesanan → `GET /api/orders/track/:id` (field terbatas, tanpa PII).
+- Menampilkan: status badge + deskripsi, timeline 4 tahap, rincian item (kategori/bahan/tipe/harga), total, tanggal dibuat & diperbarui.
+- Halaman utilitas → `noindex`.
 
 ## 4. Interaction Rules & Edge Cases
 
@@ -92,3 +102,5 @@ Container dinamis single container dengan step progress indicator bar di bagian 
 | Server API offline saat order | Fallback manual: generate teks order WhatsApp langsung ke `wa.me` |
 | Geolocation ditolak pengguna | Form alamat tetap bisa diisi manual tanpa kendala |
 | Status transisi tidak valid | Server menolak (`400 Bad Request`) memastikan siklus status urut |
+| Pembatalan pesanan | Admin klik "Batalkan Pesanan" (hanya dari `pending`/`picked_up`) → status `cancelled`, konfirmasi dialog sebelum eksekusi |
+| Lacak pesanan | Customer input nomor pesanan di `/track`; endpoint publik hanya mengembalikan status, item, harga (tanpa nama/WA/alamat/GPS) |

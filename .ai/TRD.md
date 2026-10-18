@@ -44,6 +44,8 @@ graph LR
 | **Maps & Lokasi** | Leaflet.js + Nominatim OSM | Open-source map tile tanpa biaya API key berbayar. |
 | **Client Compression**| HTML5 Canvas API | Resize & convert JPEG di browser sebelum transmisi HTTP multipart. |
 | **Runtime & Server** | Node.js (20+) + Express.js | Standardized JavaScript end-to-end. |
+| **Keamanan** | Helmet + express-rate-limit | Security headers (CSP) & pembatasan laju request. |
+| **Tooling** | ESLint + Prettier + Vitest | Lint, format, dan unit test. |
 | **Database** | SQLite (`sqlite3` + `sqlite` wrapper) | File-based asynchronous SQLite engine yang kompatibel dengan modern Node runtime. |
 | **Upload Handler** | Multer | Menangani streaming file multipart disk-storage lokal. |
 
@@ -59,7 +61,7 @@ graph LR
 | `address_note` | TEXT | NULL | Catatan patokan/lokasi |
 | `latitude` | REAL | NULL | Titik lintang GPS browser |
 | `longitude` | REAL | NULL | Titik bujur GPS browser |
-| `status` | TEXT | NOT NULL DEFAULT 'pending' | Enum: `pending`, `picked_up`, `in_progress`, `done` |
+| `status` | TEXT | NOT NULL DEFAULT 'pending' | Enum: `pending`, `picked_up`, `in_progress`, `done`, `cancelled` |
 | `total_price` | INTEGER | NOT NULL | Total tagihan rupiah |
 | `total_items` | INTEGER | NOT NULL | Jumlah pasang |
 | `created_at` | TEXT | DEFAULT `datetime('now','localtime')` | Waktu order dibuat |
@@ -94,13 +96,18 @@ graph LR
   - Fields: `customer_name`, `whatsapp`, `address`, `address_note`, `latitude`, `longitude`, `total_price`, `total_items`, `items` (JSON stringified), `photos` (binary files).
   - Response: `{ orderId: <number>, status: "success" }`
 - `GET /api/orders`
-  - Query: `?status=<status>`
+  - Query: `?status=<status>` (whitelist: `pending`, `picked_up`, `in_progress`, `done`, `cancelled`)
   - Response: Array ringkasan order urut tanggal terbaru.
+- `GET /api/orders/stats`
+  - Response: `{ total, byStatus: { pending, picked_up, in_progress, done, cancelled }, todayOrders, todayRevenue }`.
+- `GET /api/orders/track/:id`
+  - Response publik (tanpa PII): `{ id, status, total_price, total_items, created_at, updated_at, items: [{ category, material, wash_type, price }] }`. 404 jika tidak ditemukan.
 - `GET /api/orders/:id`
   - Response: Detail pesanan lengkap termasuk array items dan tautan foto.
 - `PATCH /api/orders/:id/status`
-  - Body: `{ "status": "picked_up" | "in_progress" | "done" }` (transisi maju saja: pending→picked_up→in_progress→done)
-  - Response: `{ success: true, status: "<status>" }`
+  - Body: `{ "status": "picked_up" | "in_progress" | "done" | "cancelled" }`
+  - Transisi valid: `pending→picked_up|cancelled`, `picked_up→in_progress|cancelled`, `in_progress→done`. Terminal: `done`, `cancelled`.
+  - Response: `{ success: true, status: "<status>" }`; `400` untuk transisi tidak valid.
 
 ### 4.2 Static Assets
 - `GET /uploads/:filename` -> File gambar foto pesanan.

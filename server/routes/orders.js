@@ -5,12 +5,13 @@ import { uploadMiddleware } from '../middleware/upload.js';
 
 const router = Router();
 
-const VALID_STATUSES = ['pending', 'picked_up', 'in_progress', 'done'];
+const VALID_STATUSES = ['pending', 'picked_up', 'in_progress', 'done', 'cancelled'];
 const STATUS_TRANSITIONS = {
-  pending: ['picked_up'],
-  picked_up: ['in_progress'],
+  pending: ['picked_up', 'cancelled'],
+  picked_up: ['in_progress', 'cancelled'],
   in_progress: ['done'],
   done: [],
+  cancelled: [],
 };
 
 const VALID_CATEGORIES = ['shoe', 'sandal'];
@@ -223,6 +224,38 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/stats', async (req, res) => {
+  try {
+    const db = await getDatabase();
+
+    const byStatusRows = await db.all(
+      'SELECT status, COUNT(*) as count FROM orders GROUP BY status'
+    );
+    const byStatus = { pending: 0, picked_up: 0, in_progress: 0, done: 0, cancelled: 0 };
+    for (const row of byStatusRows) {
+      if (row.status in byStatus) byStatus[row.status] = row.count;
+    }
+
+    const today = await db.get(`
+      SELECT COUNT(*) as orders, COALESCE(SUM(total_price), 0) as revenue
+      FROM orders
+      WHERE date(created_at) = date('now', 'localtime')
+    `);
+
+    const total = await db.get('SELECT COUNT(*) as count FROM orders');
+
+    res.json({
+      total: total?.count || 0,
+      byStatus,
+      todayOrders: today?.orders || 0,
+      todayRevenue: today?.revenue || 0,
+    });
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ error: 'Failed to fetch stats' });
+  }
+});
+
 // Public tracking endpoint: limited fields, no PII (name/WA/address/GPS)
 router.get('/track/:id', async (req, res) => {
   try {
@@ -266,9 +299,22 @@ router.get('/:id', async (req, res) => {
     }
 
     const items = await db.all('SELECT * FROM order_items WHERE order_id = ?', id);
-    
+
+    const itemIds = items.map((item) => item.id);
+    const photosByItem = new Map();
+    if (itemIds.length > 0) {
+      const placeholders = itemIds.map(() => '?').join(',');
+      const photos = await db.all(
+        `SELECT * FROM order_photos WHERE order_item_id IN (${placeholders})`,
+        ...itemIds
+      );
+      for (const photo of photos) {
+        if (!photosByItem.has(photo.order_item_id)) photosByItem.set(photo.order_item_id, []);
+        photosByItem.get(photo.order_item_id).push(photo);
+      }
+    }
     for (const item of items) {
-      item.photos = await db.all('SELECT * FROM order_photos WHERE order_item_id = ?', item.id);
+      item.photos = photosByItem.get(item.id) || [];
     }
 
     res.json({ ...order, items });

@@ -1,0 +1,6 @@
+dist/
+node_modules/
+server/uploads/
+server/db/washpass.db
+pnpm-lock.yaml
+public/*.png

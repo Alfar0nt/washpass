@@ -243,7 +243,7 @@
   box-shadow: var(--shadow-sm);
 }
 
-.hero__card-info h4 {
+.hero__card-info h2 {
   font-size: var(--text-base);
   font-weight: 700;
   margin: 0;
@@ -286,7 +286,7 @@
   font-weight: 800;
 }
 
-.hero__step h5 {
+.hero__step h3 {
   font-size: var(--text-sm);
   font-weight: 700;
   color: var(--color-text);

@@ -3,6 +3,7 @@ export const ORDER_STATUSES = {
   PICKED_UP: 'picked_up',
   IN_PROGRESS: 'in_progress',
   DONE: 'done',
+  CANCELLED: 'cancelled',
 };
 
 export const STATUS_LABELS = {
@@ -10,6 +11,7 @@ export const STATUS_LABELS = {
   [ORDER_STATUSES.PICKED_UP]: 'Sudah Diambil',
   [ORDER_STATUSES.IN_PROGRESS]: 'Lagi Dikerjakan',
   [ORDER_STATUSES.DONE]: 'Selesai',
+  [ORDER_STATUSES.CANCELLED]: 'Dibatalkan',
 };
 
 export const STATUS_COLORS = {
@@ -17,33 +19,40 @@ export const STATUS_COLORS = {
     bg: '#FEF3C7',
     text: '#D97706',
     border: '#FCD34D',
-    badge: 'bg-yellow-100 text-yellow-700 border-yellow-300',
+    badge: 'status-badge--pending',
   },
   [ORDER_STATUSES.PICKED_UP]: {
     bg: '#DBEAFE',
     text: '#2563EB',
     border: '#60A5FA',
-    badge: 'bg-blue-100 text-blue-700 border-blue-300',
+    badge: 'status-badge--picked-up',
   },
   [ORDER_STATUSES.IN_PROGRESS]: {
     bg: '#FFEDD5',
     text: '#EA580C',
     border: '#FB923C',
-    badge: 'bg-orange-100 text-orange-700 border-orange-300',
+    badge: 'status-badge--in-progress',
   },
   [ORDER_STATUSES.DONE]: {
     bg: '#DCFCE7',
     text: '#16A34A',
     border: '#4ADE80',
-    badge: 'bg-green-100 text-green-700 border-green-300',
+    badge: 'status-badge--done',
+  },
+  [ORDER_STATUSES.CANCELLED]: {
+    bg: '#FEE2E2',
+    text: '#B91C1C',
+    border: '#FCA5A5',
+    badge: 'status-badge--cancelled',
   },
 };
 
 export const STATUS_TRANSITIONS = {
-  [ORDER_STATUSES.PENDING]: [ORDER_STATUSES.PICKED_UP],
-  [ORDER_STATUSES.PICKED_UP]: [ORDER_STATUSES.IN_PROGRESS],
+  [ORDER_STATUSES.PENDING]: [ORDER_STATUSES.PICKED_UP, ORDER_STATUSES.CANCELLED],
+  [ORDER_STATUSES.PICKED_UP]: [ORDER_STATUSES.IN_PROGRESS, ORDER_STATUSES.CANCELLED],
   [ORDER_STATUSES.IN_PROGRESS]: [ORDER_STATUSES.DONE],
   [ORDER_STATUSES.DONE]: [],
+  [ORDER_STATUSES.CANCELLED]: [],
 };
 
 export const STATUS_DESCRIPTIONS = {
@@ -51,6 +60,7 @@ export const STATUS_DESCRIPTIONS = {
   [ORDER_STATUSES.PICKED_UP]: 'Sepatu sudah diambil oleh tim, dalam perjalanan ke workshop',
   [ORDER_STATUSES.IN_PROGRESS]: 'Sepatu sedang dalam proses pencucian di workshop',
   [ORDER_STATUSES.DONE]: 'Pencucian selesai, sepatu siap diantar kembali ke customer',
+  [ORDER_STATUSES.CANCELLED]: 'Pesanan dibatalkan',
 };
 
 export function getStatusLabel(status) {

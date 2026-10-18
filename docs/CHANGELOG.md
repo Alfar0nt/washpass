@@ -2,6 +2,33 @@
 
 ---
 
+## [v0.0.28] - 2026-10-18
+
+### Added
+- **Halaman Lacak Pesanan (`/track`)**: input nomor pesanan → status, timeline 4 tahap, rincian item, total, tanggal. Endpoint publik `GET /api/orders/track/:id` (tanpa PII).
+- **Statistik Admin**: endpoint `GET /api/orders/stats` + kartu ringkasan (count per status, order & pendapatan hari ini).
+- **Pencarian, filter tanggal, dan sort** pada daftar pesanan admin + auto-refresh 30 detik.
+- **Status `cancelled`** dengan transisi `pending`/`picked_up → cancelled`, tombol "Batalkan Pesanan", badge + kartu statistik.
+- **Sistem migrasi database** minimal via `PRAGMA user_version` (rebuild tabel `orders` untuk CHECK status baru).
+- **Halaman 404** custom, `public/sitemap.xml`, ikon PWA 192/512 + maskable.
+- **Tooling kualitas**: ESLint (flat config), Prettier, Vitest (21 test) + script `lint`, `format`, `test`.
+- **`.env.example`** (`PORT`, `NODE_ENV`, `VITE_WHATSAPP_NUMBER`, `VITE_WHATSAPP_MOCK`).
+
+### Changed
+- **Legal pages** (`/privacy`, `/terms`) dikonversi ke HTML statis (SEO-friendly) — `privacy.js`/`terms.js` dihapus, footer via `legal.js`.
+- **Google Fonts** dipindah dari `@import` CSS ke `<link>` (memutus rantai render-blocking).
+- **Keamanan backend**: helmet + CSP, rate limiting, validasi input menyeluruh, magic-byte check upload, API 404 JSON, perbaikan graceful shutdown.
+- **WhatsApp number** bersumber dari satu env (`VITE_WHATSAPP_NUMBER`).
+- **Dependency**: `multer` 2.x, `uuid` 14.
+
+### Fixed
+- Bug graceful shutdown (`server` undefined), kebocoran pesan error internal, N+1 query di detail order.
+- Badge status tak berwarna (kelas Tailwind yang tidak ada) → kelas CSS semantik.
+- Heading order hero (h1→h4) dan brand color drift (`theme-color`, manifest).
+- Placeholder nomor WA/alamat footer; testimoni hero palsu dihapus.
+
+---
+
 ## [v0.0.27] - 2026-10-18
 
 ### Added

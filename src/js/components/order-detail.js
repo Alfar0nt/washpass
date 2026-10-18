@@ -111,21 +111,29 @@ export class OrderDetail {
   }
 
   renderDetail() {
-    const { items = [], customer_name, whatsapp, address, address_note, total_price, total_items, status, created_at, latitude, longitude } = this.order;
+    const { items = [], customer_name, whatsapp, address, address_note, total_price, total_items, status, created_at, updated_at, latitude, longitude } = this.order;
     
     const validTransitions = getValidTransitions(status);
-    const statusOptions = validTransitions.length > 0 ? validTransitions : [status];
+    const forwardTransitions = validTransitions.filter(s => s !== ORDER_STATUSES.CANCELLED);
+    const canCancel = validTransitions.includes(ORDER_STATUSES.CANCELLED);
 
     this.content.innerHTML = `
       <div class="admin-detail">
         <div class="admin-detail__header">
           <div class="admin-detail__id">
             <span class="admin-detail__order-id">#${this.orderId}</span>
+            <button type="button" class="admin-detail__copy" id="copyOrderIdBtn" aria-label="Salin nomor pesanan">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              <span id="copyOrderIdLabel">Salin</span>
+            </button>
             <span class="status-badge ${getStatusBadgeClass(status)}">${getStatusLabel(status)}</span>
           </div>
           <div class="admin-detail__meta">
-            <span>${formatRelativeTime(created_at)}</span>
-            <span>${formatDate(created_at)}</span>
+            <span>Dibuat: ${formatDate(created_at)}</span>
+            ${updated_at ? `<span>Diperbarui: ${formatDate(updated_at)}</span>` : ''}
           </div>
         </div>
 
@@ -201,14 +209,19 @@ export class OrderDetail {
             <p class="admin-detail__status-desc">${getStatusDescription(status)}</p>
             <div class="admin-detail__status-selector">
               <label for="statusSelect">Ubah Status:</label>
-              <select id="statusSelect" class="form-input" ${validTransitions.length === 0 ? 'disabled' : ''}>
+              <select id="statusSelect" class="form-input" ${forwardTransitions.length === 0 ? 'disabled' : ''}>
                 <option value="${status}" selected>${getStatusLabel(status)} (Saat Ini)</option>
-                ${validTransitions.map(s => `<option value="${s}">${getStatusLabel(s)}</option>`).join('')}
+                ${forwardTransitions.map(s => `<option value="${s}">${getStatusLabel(s)}</option>`).join('')}
               </select>
-              <button type="button" class="btn btn-primary" id="updateStatusBtn" ${validTransitions.length === 0 ? 'disabled' : ''}>
+              <button type="button" class="btn btn-primary" id="updateStatusBtn" ${forwardTransitions.length === 0 ? 'disabled' : ''}>
                 Simpan Perubahan
               </button>
             </div>
+            ${canCancel ? `
+              <button type="button" class="btn btn-danger admin-detail__cancel" id="cancelOrderBtn">
+                Batalkan Pesanan
+              </button>
+            ` : ''}
           </div>
         </div>
       </div>
@@ -293,7 +306,12 @@ export class OrderDetail {
   bindDetailEvents() {
     const updateBtn = this.content.querySelector('#updateStatusBtn');
     const statusSelect = this.content.querySelector('#statusSelect');
-    
+
+    const copyBtn = this.content.querySelector('#copyOrderIdBtn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => this.copyOrderId());
+    }
+
     if (updateBtn && statusSelect) {
       updateBtn.addEventListener('click', async () => {
         const newStatus = statusSelect.value;
@@ -301,6 +319,11 @@ export class OrderDetail {
           await this.updateStatus(newStatus);
         }
       });
+    }
+
+    const cancelBtn = this.content.querySelector('#cancelOrderBtn');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => this.updateStatus(ORDER_STATUSES.CANCELLED));
     }
 
     // Bind photo click events for modal viewer
@@ -429,7 +452,25 @@ export class OrderDetail {
     modal._handleKeydown = handleKeydown;
   }
 
+  async copyOrderId() {
+    const label = this.content.querySelector('#copyOrderIdLabel');
+    try {
+      await navigator.clipboard.writeText(String(this.orderId));
+      if (label) {
+        label.textContent = 'Tersalin';
+        setTimeout(() => { label.textContent = 'Salin'; }, 2000);
+      }
+    } catch (error) {
+      console.error('Failed to copy order ID:', error);
+    }
+  }
+
   async updateStatus(newStatus) {
+    const confirmed = window.confirm(
+      `Ubah status pesanan #${this.orderId} menjadi "${getStatusLabel(newStatus)}"?`
+    );
+    if (!confirmed) return;
+
     const updateBtn = this.content.querySelector('#updateStatusBtn');
     const originalText = updateBtn.innerHTML;
     
