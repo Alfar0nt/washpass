@@ -67,6 +67,20 @@ small, .text-xs {
   font-size: var(--text-xs);
 }
 
+.demo-badge {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  margin-left: 0.4rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
 .text-sm { font-size: var(--text-sm); }
 .text-base { font-size: var(--text-base); }
 .text-lg { font-size: var(--text-lg); }

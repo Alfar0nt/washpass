@@ -2,6 +2,8 @@
 
 Spesifikasi teknis, arsitektur sistem, stack dependensi, skema basis data, dan antarmuka API.
 
+> **Branch `demo` (v0.0.29):** dokumen ini mendeskripsikan arsitektur full-stack (Express + SQLite). Di branch demo, seluruh layer backend dimock di client (`src/js/services/api.js`, localStorage) dengan **kontrak endpoint & bentuk data identik** — jadi §3 (skema) dan §4 (API) tetap jadi acuan, hanya runtime-nya yang berpindah ke browser. Deploy: Cloudflare Pages, statis dari `dist/`.
+
 ## 1. System Architecture
 
 ```mermaid

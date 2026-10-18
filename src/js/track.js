@@ -30,6 +30,7 @@ function renderHeader() {
       <a href="/" class="track-header__brand" aria-label="WashPass beranda">
         <span class="track-header__mark" aria-hidden="true">👟</span>
         <span class="track-header__logo">WashPass</span>
+        <span class="demo-badge">DEMO</span>
       </a>
       <a href="/" class="track-header__back">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">

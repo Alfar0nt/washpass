@@ -4,7 +4,9 @@ Website jasa cuci sepatu & sandal profesional dengan sistem pickup & delivery.
 
 ## Status
 
-**MVP Ready** — audit remediasi P0–P5 selesai (tracking pesanan, admin ops, status batal, SEO, keamanan, tooling). Tersisa **P6 (Brand Assets)** & **P7 (Payment/Auth — ditunda pasca-launch)**.
+**Live Demo (branch `demo`)** — versi demo publik yang sepenuhnya statis: semua data order (buat, lacak, kelola admin) dimock di `localStorage`, tanpa backend/database. Siap deploy ke Cloudflare Pages dari hasil build `dist/`.
+
+Versi full-stack asli (Express + SQLite) tetap tersedia di branch lain; kode backend `server/` dipertahankan di repo ini sebagai referensi tapi tidak di-deploy.
 
 See [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) for version history and changelog.
 
@@ -58,20 +60,8 @@ Click an image to view it in fullscreen.
 # Install dependencies
 pnpm install
 
-# Development (runs both frontend & backend)
-pnpm run dev:all
-
-# Frontend only (Vite dev server on port 5173)
+# Frontend dev server (Vite on port 5173) — semua fitur jalan via mock localStorage
 pnpm run dev
-
-# Backend only (Express on port 3000)
-pnpm run dev:server
-
-# Production build
-pnpm run build
-
-# Production server (serves dist/ + API)
-pnpm run start
 
 # Quality checks
 pnpm run lint          # ESLint
@@ -80,21 +70,46 @@ pnpm run format:check  # Prettier (check)
 pnpm test              # Vitest
 ```
 
+<details>
+<summary>Perintah backend full-stack (hanya di branch dengan Express/SQLite)</summary>
+
+```bash
+pnpm run dev:all       # Frontend + backend bersamaan
+pnpm run dev:server    # Backend Express saja (port 3000)
+pnpm run start         # Production server (dist/ + API)
+```
+
+Di branch demo ini `pnpm run dev` tidak butuh backend — `src/js/services/api.js` sudah dimock penuh.
+</details>
+
 ## Tech Stack
 
 - **Frontend**: Vite + Vanilla JS (ES Modules)
-- **Backend**: Express.js + SQLite (`sqlite3` + `sqlite`), helmet + rate limiting
-- **Upload**: Multer 2.x (magic-byte validation) + Canvas API compression (client)
+- **Data (demo)**: Mock API di `localStorage` (seed 10 order, foto data-URL, reset dari `/admin`)
+- **Backend (referensi, tidak di-deploy)**: Express.js + SQLite (`sqlite3` + `sqlite`), helmet + rate limiting
+- **Upload (demo)**: kompresi Canvas API client-side → data URL di localStorage
 - **Maps**: Leaflet.js + OpenStreetMap
 - **Location**: Browser Geolocation API + Nominatim reverse geocoding
 - **CSS**: Vanilla CSS + Custom Properties (Design Tokens)
 - **Fonts**: Plus Jakarta Sans + Inter (Google Fonts)
 - **Tooling**: ESLint + Prettier + Vitest
+- **Hosting target**: Cloudflare Pages (output build `dist/`, clean URLs `*.html` + `404.html` otomatis)
+
+## Deploy (Cloudflare Pages)
+
+```bash
+pnpm run build        # hasil: dist/
+```
+
+- Build command: `pnpm run build` — Output directory: `dist`
+- Pages otomatis menyajikan `/order` dari `order.html` (dan seterusnya) + `404.html` sebagai fallback.
+- Sebelum live publik: ganti domain placeholder di `public/sitemap.xml` & `public/robots.txt`.
+- `VITE_WHATSAPP_MOCK` default `true` (demo); set `false` + isi `VITE_WHATSAPP_NUMBER` bila ingin redirect `wa.me` nyata.
 
 ## Next Steps
 
-1. **P6 — Brand Assets**: logo SVG, ilustrasi hero, ikon material & step (skill `design`)
-2. **P7 — Ditunda pasca-MVP**: Payment Gateway Midtrans Snap, auth admin, notifikasi, dll.
-3. **Production deployment** — Build & deploy to Railway/Render/VPS (ganti domain placeholder di `sitemap.xml` & `robots.txt`)
+1. Deploy `dist/` ke Cloudflare Pages (ganti domain placeholder di `sitemap.xml` & `robots.txt`).
+2. **P6 — Brand Assets**: logo SVG, ilustrasi hero, ikon material & step (skill `design`).
+3. **Full-stack / P7 — ditunda**: gabung ke branch backend (Express + SQLite) untuk launch produksi; Payment Gateway Midtrans Snap, auth admin, notifikasi.
 
 Lihat [`.ai/IMPLEMENTATION-PLAN.md`](./.ai/IMPLEMENTATION-PLAN.md) untuk status terkini.

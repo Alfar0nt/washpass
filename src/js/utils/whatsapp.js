@@ -3,11 +3,9 @@ import { formatCurrency } from './formatters.js';
 // Configure via .env: VITE_WHATSAPP_NUMBER, VITE_WHATSAPP_MOCK
 let WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '6281234567890';
 
-// Mock mode: when true, the WhatsApp step never blocks order confirmation.
-// Default: true in dev, false in production (unless VITE_WHATSAPP_MOCK=true).
-let WHATSAPP_MOCK = import.meta.env.DEV
-  ? import.meta.env.VITE_WHATSAPP_MOCK !== 'false'
-  : import.meta.env.VITE_WHATSAPP_MOCK === 'true';
+// Mock mode: branch demo selalu mock kecuali VITE_WHATSAPP_MOCK=false eksplisit
+// (build statis untuk live demo, tanpa backend).
+let WHATSAPP_MOCK = import.meta.env.VITE_WHATSAPP_MOCK !== 'false';
 
 export function getWhatsAppNumber() {
   return WHATSAPP_NUMBER;

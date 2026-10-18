@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin
 
-Sitemap: https://washpass.example.com/sitemap.xml
+Sitemap: https://demo-washpass.dhiarharianto.work/sitemap.xml

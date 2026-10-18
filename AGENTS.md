@@ -3,7 +3,7 @@
 Instruksi dan standar kerja autonomous agent di codebase WashPass.
 
 ## Project Status
-**MVP Ready** — audit remediasi P0–P5 selesai (tracking, admin ops, status batal, SEO, keamanan, tooling). Tersisa **P6 (Brand Assets)** & **P7 (Payment/Auth — ditunda pasca-launch)**. Rujukan: `.ai/IMPLEMENTATION-PLAN.md`.
+**Live Demo (branch `demo`)** — versi statis untuk deploy Cloudflare Pages. Semua data order dimock di `localStorage` (`src/js/services/api.js` + seed `src/js/services/mock-data.js`); backend `server/` tetap ada di repo sebagai referensi tapi **tidak di-deploy**. WhatsApp default mock (`VITE_WHATSAPP_MOCK` default `true`). Rujukan: `.ai/IMPLEMENTATION-PLAN.md`.
 
 ## Core Agent Rules & Environment
 
@@ -25,15 +25,16 @@ Instruksi dan standar kerja autonomous agent di codebase WashPass.
 
 ## Tech Stack Overview
 - **Frontend Build**: Vite (Vanilla JS, ES Modules)
-- **Backend**: Express.js (Node.js)
-- **Database**: SQLite via `sqlite3` + `sqlite` (async wrapper, Node.js 20+ compatible)
-- **File Upload**: Multer (server-side) + Canvas API compression (client-side)
+- **Data (demo)**: Mock API localStorage — kontrak ekspor `services/api.js` identik dengan backend Express
+- **Backend (referensi, tidak aktif di demo)**: Express.js (Node.js) + SQLite via `sqlite3` + `sqlite`
+- **File Upload (demo)**: kompresi Canvas API client-side → data URL di localStorage
 - **Maps**: Leaflet.js + OpenStreetMap
 - **Location**: Browser Geolocation API + Nominatim reverse geocoding
 - **Language**: JavaScript ES2022+ (No TypeScript)
 - **CSS**: Vanilla CSS + Custom Properties (Design Tokens), BEM-inspired
 - **Fonts**: Plus Jakarta Sans (Headings), Inter (Body)
 - **Icons**: Lucide Icons (Inline SVG)
+- **Deploy target**: Cloudflare Pages (build `dist/`, tanpa server runtime)
 
 ## Project Structure
 ```
@@ -71,7 +72,9 @@ washpass/
 │   │   ├── legal.js        # Legal pages bootstrap (footer)
 │   │   ├── config/pricing.js # Source of truth harga & katalog
 │   │   ├── components/     # Reusable UI component modules
-│   │   ├── services/api.js # API client HTTP
+│   │   ├── services/api.js # Mock API localStorage (kontrak sama dgn Express)
+│   │   ├── services/mock-data.js # Seed 10 order demo + foto placeholder SVG
+│   │   ├── services/api.test.js # Vitest mock API (9 test)
 │   │   └── utils/          # Helper modules (+ *.test.js Vitest)
 │   └── assets/
 ├── public/                 # Static assets (favicon, manifest, og-image, icons, sitemap.xml, robots.txt)
@@ -91,6 +94,8 @@ washpass/
 ```
 
 ## API Endpoints
+Kontrak identik dengan backend Express — di branch demo di-mock penuh di `src/js/services/api.js` (localStorage), tidak ada HTTP call.
+
 | Method | Endpoint | Fungsi |
 |---|---|---|
 | `POST` | `/api/orders` | Buat order baru (multipart: data + items + foto + GPS) |
@@ -99,20 +104,21 @@ washpass/
 | `GET` | `/api/orders/track/:id` | Lacak order publik (field terbatas, tanpa PII) |
 | `GET` | `/api/orders/:id` | Ambil detail spesifik order |
 | `PATCH` | `/api/orders/:id/status` | Update status (`pending` → `picked_up` → `in_progress` → `done`, atau `cancelled` dari `pending`/`picked_up`) |
-| `GET` | `/uploads/:filename` | Sajikan foto sepatu yang diunggah |
+| `GET` | `/uploads/:filename` | Foto pesanan (demo: data URL dari localStorage) |
 
 ## Development Commands
 ```bash
 pnpm install         # Install dependencies
-pnpm run dev:all     # Jalankan frontend (Vite :5173) & backend (Express :3000) bersamaan
-pnpm run dev         # Frontend saja
-pnpm run dev:server  # Backend Express saja
-pnpm run build       # Build bundle frontend ke folder dist/
-pnpm run start       # Jalankan server Express production (melayani API + dist/)
+pnpm run dev         # Frontend saja (Vite :5173) — semua fitur jalan via mock localStorage
+pnpm run build       # Build bundle frontend ke folder dist/ (hasil deploy Cloudflare Pages)
 pnpm run lint        # ESLint (flat config)
 pnpm run format      # Prettier (write)
-pnpm test            # Vitest (unit test utils)
+pnpm test            # Vitest (utils + mock API)
 pnpm run clean:ports # Bersihkan port 3000 & 5173 jika hang/bentrok
+# Berikut hanya untuk mode full-stack (branch backend, tidak di-deploy di demo):
+pnpm run dev:all     # Frontend (Vite :5173) & backend (Express :3000) bersamaan
+pnpm run dev:server  # Backend Express saja
+pnpm run start       # Server Express production (melayani API + dist/)
 ```
 
 ## Referensi Dokumentasi

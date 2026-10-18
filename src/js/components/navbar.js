@@ -19,6 +19,7 @@ export class Navbar {
                 <path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
               </svg>
               <span>WashPass</span>
+              <span class="demo-badge">DEMO</span>
             </a>
             
             <nav class="navbar__nav" id="navbarNav" aria-label="Navigasi utama">

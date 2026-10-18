@@ -2,6 +2,8 @@
 
 Dokumentasi arsitektur alur pengguna, peta situs, state navigasi, dan interaksi halaman WashPass.
 
+> **Branch `demo` (v0.0.29):** alur identik, tetapi "server" pada diagram/edge-case berarti mock `localStorage` (`src/js/services/api.js`). Tidak ada panggilan HTTP; deploy statis ke Cloudflare Pages.
+
 ## 1. Sitemap & Route Hierarchy
 
 ```mermaid

@@ -1,5 +1,6 @@
 import { initOrderList } from './components/order-list.js';
 import { initOrderDetail } from './components/order-detail.js';
+import { resetDemoData } from './services/api.js';
 
 const app = document.getElementById('app');
 
@@ -19,6 +20,8 @@ function init() {
             <span>WashPass Admin</span>
           </div>
           <span class="admin-badge">Panel Admin</span>
+          <span class="demo-badge">DEMO</span>
+          <button type="button" class="btn btn-outline btn-sm" id="resetDemoBtn">Reset Demo</button>
         </div>
       </div>
     </header>
@@ -39,6 +42,13 @@ function init() {
 
   orderDetail = initOrderDetail(modalContainer, {
     onClose: () => {},
+  });
+
+  document.getElementById('resetDemoBtn').addEventListener('click', () => {
+    if (confirm('Reset semua data demo ke seed awal?')) {
+      resetDemoData();
+      window.location.reload();
+    }
   });
 }
 

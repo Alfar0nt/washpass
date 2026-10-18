@@ -4,6 +4,8 @@
 > **Tanggal:** 27 Agustus 2026  
 > **Status:** Draft — Revisi (tambah backend + admin order list)
 
+> **Catatan branch `demo` (v0.0.29):** versi demo publik berjalan statis di Cloudflare Pages. Seluruh penyimpanan order yang di PRD ini disebut "disimpan di server (SQLite)" digantikan mock `localStorage` (`src/js/services/api.js`) yang meniru kontrak API identik — alur produk, harga, dan perilaku WA tetap sama. Backend Express tetap acuan versi produksi.
+
 ---
 
 ## 1. Ringkasan Produk

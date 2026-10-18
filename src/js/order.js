@@ -61,6 +61,7 @@ function renderBackToHomeBar() {
       <a href="/" class="order-header__logo" aria-label="WashPass beranda">
         <span class="order-header__logo-mark">👟</span>
         <span class="order-header__logo-text">WashPass</span>
+        <span class="demo-badge">DEMO</span>
       </a>
     </header>
   `;

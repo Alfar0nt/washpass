@@ -2,7 +2,7 @@
 
 Status komprehensif implementasi proyek WashPass. Pekerjaan tertunda diletakkan di bagian atas, diikuti ringkasan terkompresi dari pekerjaan yang sudah selesai di bagian bawah.
 
-Diperbarui: 2026-10-18 — audit remediasi P0–P5 selesai (customer + admin), tinggal P6 (brand assets) & P7 (ditunda pasca-MVP).
+Diperbarui: 2026-10-18 — branch `demo`: live demo statis (mock localStorage) siap deploy Cloudflare Pages (v0.0.29); audit remediasi P0–P5 selesai; tinggal P6 (brand assets) & P7 (ditunda pasca-MVP).
 
 ---
 
@@ -28,6 +28,7 @@ Skill: `design` (generasi logo/icon).
 ### Audit Remediasi (2026-10-18)
 | Prioritas | Ruang Lingkup | Status | Rangkuman Hasil |
 |---|---|---|---|
+| **Live Demo Statis (v0.0.29)** | Mock API + deploy prep | ✅ Selesai (2026-10-18) | `services/api.js` dimock penuh ke localStorage (kontrak ekspor identik dgn Express; quota-aware foto data URL); seed 10 order (`mock-data.js`) campuran semua status + placeholder SVG; badge `DEMO` di 4 header; tombol "Reset Demo" di admin; WA mock default `true`; 9 test mock API; README/AGENTS/CHANGELOG disesuaikan untuk branch demo — target deploy Cloudflare Pages (`dist/`, `server/` tidak di-deploy). |
 | **P0: Bug Kritis & Backend Hygiene** | Keamanan & bug backend | ✅ Selesai | Fix graceful shutdown; API 404 JSON; hapus error.message leak; validasi input server menyeluruh; express-rate-limit (300/15m API, 30/15m POST) + helmet/CSP; config `VITE_WHATSAPP_NUMBER`/`VITE_WHATSAPP_MOCK`; `.env.example`; sinkronisasi dokumen (PRD/TRD/README/APP-FLOW/AGENTS). |
 | **P1: Customer (janji produk)** | Tracking & placeholder | ✅ Selesai | Halaman `/track` (timeline + rincian) + endpoint `GET /api/orders/track/:id` (tanpa PII); WA number dari env tunggal; alamat footer diperbaiki; testimoni hero palsu dihapus → kartu "Semudah 3 Langkah". |
 | **P2: Admin Operations** | UX operasional admin | ✅ Selesai | Pencarian (nama/WA/ID), filter tanggal, sort; kartu statistik + `GET /api/orders/stats`; konfirmasi ganti status; render `updated_at`; auto-refresh 30s; tombol copy order ID; fix bug filter status. |
@@ -51,7 +52,7 @@ Skill: `design` (generasi logo/icon).
 ### Catatan Penting (Accepted Risks & Follow-up)
 - **Tanpa auth admin** (keputusan MVP): `PATCH /api/orders/:id/status` terbuka — *accepted risk*. Auth ditunda ke iterasi pasca-launch.
 - **Tracking enumerable**: order ID sekuensial → endpoint `/track` dapat dienumerasi (hanya status/items/harga, tanpa PII). Bisa ditambah verifikasi nomor WA bila perlu.
-- **Domain placeholder** `washpass.example.com` di `public/sitemap.xml` + `public/robots.txt` — **ganti saat deploy**.
+- **Domain demo** `demo-washpass.dhiarharianto.work` sudah diset di `public/sitemap.xml` + `public/robots.txt` (Cloudflare Pages).
 - `/track` sengaja `noindex` (halaman utilitas) → skor SEO Lighthouse rendah (bukan masalah).
 - **Lint**: 26 warning (debt lama kode existing), 0 error. Perapian menyeluruh = pekerjaan tersendiri.
 - Verifikasi manual Firefox disarankan (Lighthouse hanya Chromium; audit dijalankan via Brave).

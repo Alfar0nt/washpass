@@ -94,6 +94,7 @@ Mengikuti standar `animate` (Emil Kowalski animation philosophy):
 - **Touch Targets**: Minimum $44 \times 44\text{ px}$ (`--touch-target-min`).
 - **Tap Feedback**: Haptic visual `transform: scale(0.97)` berdurasi `100ms` pada `.btn` dan selectable cards.
 - **Mobile Bottom Bar / Sticky CTA**: Pada layar `< 768px`, tombol konfirmasi atau order step menempel di bawah (safe-area compliant).
+- **Demo Badge** (`.demo-badge`): label kecil di navbar/header halaman (order, track, admin) penanda mode live demo — radius pill, background `#FEF3C7`, border `#FCD34D`, text `#92400E`, uppercase bold.
 - **Cards (Material & Wash Type)**:
   - Default: Border `--color-border`, background `--color-surface`.
   - Selected: Border `--color-primary` (2px), box-shadow `--shadow-md`, background `--color-primary-tint`.

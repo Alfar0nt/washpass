@@ -2,6 +2,23 @@
 
 ---
 
+## [v0.0.29] - 2026-10-18
+
+Branch `demo` — versi live demo statis untuk Cloudflare Pages (tanpa backend/database).
+
+### Added
+- **Mock API localStorage** (`src/js/services/api.js`): seluruh 6 endpoint dipindah ke client-side dengan kontrak ekspor identik — caller (`order.js`, `order-list.js`, `order-detail.js`, `track.js`) tidak berubah. Foto dikompres ulang ke data URL 640px/q0.6; penanganan quota `QuotaExceededError` (strip foto → retry).
+- **Seed data demo** (`src/js/services/mock-data.js`): 10 order awal campuran semua status (pending/picked_up/in_progress/done/cancelled), harga dari katalog `PRICING`, alamat + koordinat Jabodetabek, foto placeholder SVG.
+- **Badge `DEMO`** di navbar landing, header order, header track, dan header admin.
+- **Tombol "Reset Demo"** di header admin — kembalikan data ke seed awal.
+- **Test mock API** (`src/js/services/api.test.js`, 9 test): seed, sanitasi track (tanpa PII), transisi status, stats, submit, validasi WhatsApp, reset.
+
+### Changed
+- **WhatsApp mock default**: `VITE_WHATSAPP_MOCK` kini default `true` di branch demo (redirect `wa.me` hanya jika `VITE_WHATSAPP_MOCK=false` eksplisit).
+- **Backend `server/` tidak di-deploy**: tetap di repo untuk referensi/full-stack asli; Cloudflare Pages hanya melayani hasil `pnpm run build` (`dist/`).
+
+---
+
 ## [v0.0.28] - 2026-10-18
 
 ### Added
